@@ -1,38 +1,40 @@
-# PlanPilot
+# PlanPilot – KOBİ Talep & Randevu Yönetimi
 
-KOBİ'ler için akıllı randevu ve talep yönetim sistemi.  
-Müşterileriniz tek bir form üzerinden hizmet talebinde bulunur; talepler sunucuda güvenle ve kalıcı olarak saklanır.
+KOBİ'lerin (hukuk büroları, klinikler, mali müşavirler, ajanslar vb.) müşteri taleplerini, randevularını ve teklif isteklerini tek bir sayfadan düzenli şekilde toplamasını sağlayan sade bir web uygulaması.
 
-## Canlı Demo
+Müşteri formu doldurur, bilgiler sunucuda doğrulanıp kalıcı olarak kaydedilir ve kullanıcıya bir takip numarası verilir.
 
-> **URL:** https://planpilot.onrender.com *(veya aktif deploy URL'si)*
+## 🔗 Canlı Adres & Kaynak Kod
 
-## Teknoloji Yığını
+- **Canlı Demo:** [https://planpilot-xcun.onrender.com/](https://planpilot-xcun.onrender.com/)
+- **Kaynak Kod (GitHub):** [https://github.com/goktugis/planpilot](https://github.com/goktugis/planpilot)
+- **AI Karar Günlüğü:** [AI_LOG.md](AI_LOG.md)
 
-| Katman      | Teknoloji                                         |
-|-------------|---------------------------------------------------|
-| Frontend    | HTML5 (Semantik & Erişilebilir), CSS3, Vanilla JS |
-| Backend     | Node.js (v18+) + Express 4                        |
-| Veritabanı  | In-Memory Cache destekli JSON kalıcı depolama     |
-| Güvenlik    | Helmet (özel CSP), express-rate-limit, Input Sanitization |
+---
 
-### Neden Bu Stack?
+## 🛠️ Kullanılan Teknolojiler
 
-- **Framework yükü yok (Vanilla):** Tek sayfalık landing page ve talep formu için React/Vue gibi büyük framework'lerin overhead'i engellendi. İlk yükleme süresi sıfıra yakın.
-- **JSON + In-Memory Caching:** C++ derleyicisi gerektirmeyen (Node v24 uyumlu), taşınabilir ve anında ayağa kalkan kalıcı depolama. Disk I/O yükü azaltıldı, dosya bozulmasına karşı otomatik snapshot yedekleme eklendi.
-- **Dış Bağımlılıksız CSS:** Tailwind derleme adımı ve dış CDN kesintisi riski ortadan kaldırıldı; saf CSS custom properties ve modern fluid tipografi kullanıldı.
+- **Frontend:** HTML5, CSS3 (saf CSS, harici framework yok), Vanilla JavaScript
+- **Backend:** Node.js, Express.js
+- **Veri Saklama:** JSON dosya tabanlı kalıcı depolama (`data/requests.json` + bellek içi önbellek)
+- **Güvenlik:** Helmet (CSP başlıkları), Express Rate Limit (15 dk / 50 istek sınırı), XSS sanitizasyonu
 
-## Kurulum ve Çalıştırma
+### Neden Bu Yapı?
+- Büyük framework'ler (React/Vue vb.) veya harici CSS kütüphaneleri (Tailwind CDN) olmadan, tek komutla hemen çalışan sade ve hızlı bir yapı tercih ettim.
+- Veritabanı olarak native C++ derlemesi gerektirmeyen dosya tabanlı JSON depolama kullandım; böylece hem yerel ortamda hem de Render üzerinde sıfır kurulum sorunuyla çalışıyor.
+
+---
+
+## 🚀 Kurulum ve Çalıştırma
 
 ### Gereksinimler
-
-- **Node.js** ≥ 18
-- **npm** (Node.js ile birlikte gelir)
+- **Node.js** (v18 veya üzeri)
+- **npm**
 
 ### Adımlar
 
 ```bash
-# 1. Depoyu klonlayın
+# 1. Projeyi klonlayın
 git clone https://github.com/goktugis/planpilot.git
 cd planpilot
 
@@ -43,138 +45,88 @@ npm install
 npm start
 ```
 
-Sunucu varsayılan olarak `http://localhost:3000` adresinde ayağa kalkacaktır.
+Tarayıcınızda `http://localhost:3000` adresine giderek sayfayı görebilirsiniz.  
+*(İlk çalıştırmada `data/requests.json` dosyası otomatik olarak oluşturulur).*
 
-> **Not:** `data/requests.json` dosyası ilk çalıştırmada otomatik oluşturulur.
+---
 
-### Ortam Değişkenleri
-
-| Değişken | Varsayılan | Açıklama            |
-|----------|-----------|----------------------|
-| `PORT`   | `3000`    | Sunucu port numarası |
-
-## Proje Mimarisi
-
-```
-planpilot/
-├── server.js          # Express sunucusu, API rotaları, doğrulama, rate limit, CSP
-├── database.js        # In-memory cache ve bozulma korumalı JSON kalıcı depolama
-├── package.json       # Bağımlılıklar ve npm betikleri
-├── render.yaml        # Render.com tek tıkla canlıya alma bildirimi
-├── public/
-│   ├── index.html     # Responsive & WCAG uyumlu landing page ve talep formu
-│   └── script.js      # İstemci tarafı dinamik doğrulama, timeout, UX yönetimi
-├── data/              # Kalıcı veritabanı dizini (.gitignore'a dahildir)
-│   └── requests.json  # Kalıcı taleplerin saklandığı JSON veri kütüğü
-├── README.md          # Proje dokümantasyonu ve test rehberi
-├── AI_LOG.md          # Karar günlüğü ve yapay zeka ile geliştirme süreci
-└── .gitignore
-```
-
-## API Dokümantasyonu
+## 📡 API Uç Noktaları
 
 ### `POST /api/requests`
+Formdan gelen talep verisini doğrular ve sunucuya kaydeder.
 
-Yeni bir hizmet talebi oluşturur.
-
-**İstek Gövdesi (JSON):**
-
+**Örnek İstek (JSON):**
 ```json
 {
-  "full_name": "Ayşe Yılmaz",
-  "email": "ayse@firma.com",
+  "full_name": "Ahmet Yılmaz",
+  "email": "ahmet@ornek.com",
   "service_type": "danismanlik",
-  "description": "Dijital dönüşüm danışmanlığı hakkında bilgi almak istiyorum."
+  "description": "Yeni proje için danışmanlık randevusu almak istiyorum."
 }
 ```
 
-**Geçerli `service_type` Seçenekleri:**  
-`danismanlik` · `teklif` · `teknik-destek` · `genel-bilgi`
+**Geçerli Hizmet Türleri:** `danismanlik`, `teklif`, `teknik-destek`, `genel-bilgi`
 
-**Başarılı Yanıt (`201 Created`):**
-
+**Başarılı Yanıt (201 Created):**
 ```json
 {
   "success": true,
   "message": "Talebiniz başarıyla kaydedildi!",
   "data": {
     "id": 1,
-    "created_at": "2026-10-01T13:13:56.105Z"
+    "created_at": "2026-10-01T13:30:00.000Z",
+    "service_type": "danismanlik"
   }
 }
 ```
 
-**Doğrulama / Hata Yanıtı (`400 Bad Request`):**
-
+**Hatalı Yanıt (400 Bad Request):**
 ```json
 {
   "success": false,
-  "errors": [
-    "Ad soyad en az 2 karakter olmalıdır.",
-    "Geçerli bir e-posta adresi giriniz."
-  ]
+  "errors": ["Ad soyad en az 2 karakter olmalıdır.", "Geçerli bir e-posta adresi giriniz."]
 }
 ```
 
 ### `GET /api/health`
+Sunucu durumunu ve kayıtlı toplam talep sayısını döner:
+```json
+{ "status": "ok", "total_requests": 5 }
+```
 
-Sunucunun canlılığını ve kayıtlı toplam talep adedini döner.
-
+### `GET /api/stats`
+Kategorilere göre talep dağılımını gösterir:
 ```json
 {
-  "status": "ok",
-  "total_requests": 3
+  "success": true,
+  "stats": {
+    "total_requests": 5,
+    "distribution": { "danismanlik": 2, "teklif": 2, "teknik-destek": 1, "genel-bilgi": 0 },
+    "uptime_seconds": 120
+  }
 }
 ```
 
-### `ALL /api/*`
+---
 
-Tanımlanmamış API uçları için standart `404 Not Found` JSON yanıtı verir.
+## 🧪 Yapılan Testler
 
-## Doğrulama Kuralları
+1. **Form Doğrulama Testi (İstemci):** Alanları boş bırakıp gönderdiğimde ilgili alanların kırmızı çerçeve alıp hata mesajı verdiğini ve ilk hatalı alana odaklandığını (focus) test ettim.
+2. **Sunucu Doğrulama Testi:** API'ye doğrudan hatalı verilerle POST isteği atıp sunucunun `400 Bad Request` ve açıklayıcı hata listesi döndüğünü doğruladım.
+3. **Başarılı Kayıt ve Takip ID:** Doğru bilgiler girildiğinde sunucudan 201 döndüğünü, ekranda yeşil kutuda `#1`, `#2` gibi talep ID'sinin çıktığını ve formun temizlendiğini gördüm.
+4. **Veri Kalıcılığı:** Sunucuyu kapatıp (`Ctrl+C`) tekrar başlattım; `data/requests.json` dosyasındaki eski kayıtların silinmediğini `/api/health` üzerinden teyit ettim.
+5. **Güvenlik Testleri:** Form alanlarına `<script>` etiketi yazarak XSS denedim, HTML etiketlerinin zararsız hale getirildiğini gördüm. Kısa sürede art arda 50+ istek atarak rate limiter'ın devreye girdiğini doğruladım.
+6. **Mobil Uyumluluk:** Chrome DevTools ile 375px mobil, 768px tablet ve masaüstü ekran boyutlarında sayfa düzenini kontrol ettim.
 
-Tüm alanlar hem **istemci tarafında** (kullanıcıya anlık geri bildirim için) hem de **sunucu tarafında** (güvenlik için) çift katmanlı doğrulanır:
+---
 
-| Alan          | Kural                                           | İstemci | Sunucu |
-|---------------|-------------------------------------------------|:-------:|:------:|
-| `full_name`   | Zorunlu, 2 – 100 karakter                       |   ✅    |   ✅   |
-| `email`       | Zorunlu, RFC uyumlu e-posta, maks 254 karakter  |   ✅    |   ✅   |
-| `service_type`| Zorunlu, belirlenen izinli liste (whitelist)    |   ✅    |   ✅   |
-| `description` | Zorunlu, 10 – 1000 karakter                     |   ✅    |   ✅   |
+## 📌 Bilinen Eksikler ve İleride Yapılabilecekler
 
-## Güvenlik ve Dayanıklılık Önlemleri
+- **E-posta Gönderimi:** Talep geldiğinde hem işletmeye hem müşteriye teyit maili atılması gerçek hayatta SendGrid / Resend veya Nodemailer ile bağlanabilir (şu an arayüzde simüle edilmiştir).
+- **Yönetici Paneli:** Gelen talepleri listeleyip durumunu (Yeni, İncelendi, Tamamlandı) güncelleyecek bir giriş ekranı eklenebilir.
+- **Veritabanı:** Proje büyüyüp aynı anda binlerce istek almaya başlarsa JSON dosyası yerine PostgreSQL'e geçiş yapılabilir.
 
-- **Sıkılaştırılmış CSP (Content Security Policy):** `scriptSrc` üzerinden `'unsafe-inline'` kaldırıldı; sadece yerel statik betiklere izin verilir.
-- **Rate Limiting:** 15 dakikalık pencerede IP başına en fazla 50 istek sınırlandırıldı.
-- **XSS Koruması & Sanitizasyon:** Serbest metin alanları (`full_name`, `description`) sanitize edilerek saklanır. İstemci tarafında `innerHTML` yerine güvenli DOM API'ları kullanılır.
-- **İstek Boyutu Limiti:** JSON payload'ları en fazla 10 KB ile sınırlandırıldı.
-- **Bozulma Güvenliği (Data Integrity):** Veritabanı dosyası hasar görürse otomatik olarak zaman damgalı yedek (`.corrupt.<timestamp>`) oluşturulur ve sistem çökmeden temiz bir durumla ayağa kalkar.
-- **İstek Zaman Aşımı (Timeout):** Ağ kopukluklarında kullanıcının takılı kalmaması için istemcide 15 saniyelik zaman aşımı koruması bulunur.
+---
 
-## Erişilebilirlik (A11y) ve Kullanıcı Deneyimi (UX)
-
-- **Klavye Gezinimi & Skip Link:** Ekran okuyucu ve klavye kullanıcıları için doğrudan forma atlama bağlantısı (`#talep-formu`).
-- **ARIA Desteği:** `aria-live="assertive"` alert kutuları, `aria-invalid`, `aria-describedby` hata etiketleri ve ekran okuyucu uyarıları.
-- **Touch Target (WCAG 2.5.8):** Butonlar ve form elemanları mobilde en az 44–48px temas alanına sahiptir.
-- **iOS Zoom Önlemi:** Input alanlarında Safari otomatik yakınlaştırmasını önleyen 16px font boyutu standardı.
-- **Prefeers-Reduced-Motion:** Hareket hassasiyeti olan kullanıcılar için animasyonları ve yumuşak kaydırmayı kapatan CSS kuralları.
-
-## Doğrulama ve Test Senaryoları
-
-Yapılan manuel ve uçtan uca testler:
-
-1. **Boş / Eksik Form Gönderimi:** İstemci tarafında alan bazlı dinamik hata mesajları tetiklenir, ilk hatalı alana odaklanılır.
-2. **Geçersiz Veri / Sunucu Doğrulaması:** İstemci atlanarak doğrudan API'ye yapılan hatalı POST çağrıları `400 Bad Request` ve detaylı hata dizisiyle yanıtlanır.
-3. **Başarılı Akış:** Geçerli talep sunucuda saklanır, `201 Created` yanıtı alınır, kullanıcıya atanan talep ID'si yeşil bildirimle sunulur ve form sıfırlanır.
-4. **Veri Kalıcılığı:** Sunucu yeniden başlatıldığında `/api/health` üzerinden önceki kayıtların korunduğu teyit edilmiştir.
-5. **Erişilebilirlik Audit'i:** Lighthouse / WCAG kriterlerinde semantik yapı, kontrast oranları ve etiketlemeler denetlenmiştir.
-
-## Bilinen Eksikler ve Gelecek İyileştirmeler
-
-- **E-posta Bildirimi:** Gerçek dünyada talep oluştuğunda SendGrid/Resend benzeri servislerle işletmeye ve müşteriye e-posta gönderimi eklenebilir (kurgusal proje kapsamında simüle edilmiştir).
-- **Yönetim Paneli:** Gelen taleplerin durumlarını (Beklemede, İncelendi, Tamamlandı) güncelleyecek yetkili bir gösterge paneli.
-- **İlişkisel Veritabanı:** Çok yüksek trafik ve eşzamanlı yazma durumlarında PostgreSQL'e geçiş.
-
-## Lisans
-
-Bu proje, iş başvurusu teknik değerlendirmesi amacıyla hazırlanmış kurgusal bir projedir. Ticari amaç taşımamaktadır.
+## 📄 Lisans
+Bu proje, iş başvurusu değerlendirme süreci kapsamında hazırlanmış kurgusal bir çalışmadır.
