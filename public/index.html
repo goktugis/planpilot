@@ -3,436 +3,955 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PlanPilot – Akıllı Randevu &amp; Talep Yönetimi</title>
-  <meta name="description" content="KOBİ'ler için akıllı randevu ve talep yönetim sistemi. Müşteri taleplerini tek noktadan yönetin." />
-
-  <!-- Open Graph / Sosyal Medya -->
-  <meta property="og:title" content="PlanPilot – Akıllı Randevu & Talep Yönetimi" />
-  <meta property="og:description" content="KOBİ'ler için akıllı randevu ve talep yönetim sistemi." />
+  <title>PlanPilot – KOBİ'ler İçin Akıllı Randevu &amp; Talep Yönetimi</title>
+  <meta name="description" content="PlanPilot ile müşteri taleplerini, randevuları ve teklif isteklerini tek bir akıllı panelde toplayın. WhatsApp karmaşasına son verin." />
+  
+  <!-- Open Graph / Meta -->
+  <meta property="og:title" content="PlanPilot – KOBİ'ler İçin Akıllı Talep Yönetimi" />
+  <meta property="og:description" content="Müşteri taleplerini düzenli şekilde toplayın, gecikmeden yanıtlayın ve işinizi büyütün." />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#4F46E5" />
 
-  <!-- Favicon (inline SVG – dış dosya bağımlılığı yok) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%234F46E5'/><text x='50' y='72' font-size='60' font-weight='bold' text-anchor='middle' fill='white'>P</text></svg>" />
+  <!-- Inline SVG Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='22' width='100' height='100' fill='%234F46E5'/><path d='M30 70V30h22a16 16 0 1 1 0 32H30' fill='none' stroke='white' stroke-width='9' stroke-linecap='round'/></svg>" />
 
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
   <style>
-    /* ── Reset & Base ── */
+    /* ── Reset & CSS Custom Properties ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
     :root {
       --primary: #4F46E5;
-      --primary-dark: #4338CA;
-      --primary-light: #EEF2FF;
-      --text: #1E293B;
-      --text-light: #64748B;
+      --primary-hover: #4338CA;
+      --primary-subtle: #EEF2FF;
+      --primary-glow: rgba(79, 70, 229, 0.25);
+      --accent: #06B6D4;
+      --text: #0F172A;
+      --text-muted: #475569;
+      --text-subtle: #94A3B8;
       --bg: #FFFFFF;
       --bg-alt: #F8FAFC;
+      --bg-card: #FFFFFF;
       --border: #E2E8F0;
-      --success: #047857;
+      --border-focus: #4F46E5;
+      --success: #059669;
       --success-bg: #ECFDF5;
       --success-border: #A7F3D0;
-      --error: #B91C1C;
+      --error: #DC2626;
       --error-bg: #FEF2F2;
       --error-border: #FECACA;
-      --radius: 12px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
-      --shadow-lg: 0 4px 24px rgba(0,0,0,0.1);
-      --transition: 0.2s ease;
+      --warning: #D97706;
+      --warning-bg: #FFFBEB;
+      --radius-sm: 8px;
+      --radius: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      --shadow-hover: 0 25px 30px -5px rgba(79, 70, 229, 0.12), 0 12px 16px -6px rgba(15, 23, 42, 0.06);
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: var(--text);
       background: var(--bg);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    a { color: var(--primary); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    img { max-width: 100%; height: auto; }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font-family: inherit; }
 
     /* ── Skip Navigation (Erişilebilirlik) ── */
     .skip-link {
-      position: absolute; top: -100%; left: 16px; z-index: 200;
-      background: var(--primary); color: #fff; padding: 12px 24px;
-      border-radius: 0 0 8px 8px; font-weight: 600; font-size: 0.9rem;
-      transition: top 0.2s;
+      position: absolute; top: -120px; left: 24px; z-index: 999;
+      background: var(--primary); color: #FFFFFF; padding: 12px 24px;
+      border-radius: var(--radius-sm); font-weight: 600; font-size: 0.95rem;
+      transition: top 0.2s ease;
+      box-shadow: var(--shadow-lg);
     }
-    .skip-link:focus { top: 0; text-decoration: none; }
+    .skip-link:focus { top: 16px; }
 
-    /* ── Layout ── */
-    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
-    .section { padding: 80px 0; }
+    /* ── Layout & Ortak Bileşenler ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 96px 0; }
+    .section-alt { background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 999px;
+      font-size: 0.825rem; font-weight: 600; letter-spacing: 0.3px;
+      background: var(--primary-subtle); color: var(--primary);
+      border: 1px solid rgba(79, 70, 229, 0.15);
+    }
+    .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+
+    .section-header { text-align: center; max-width: 680px; margin: 0 auto 56px; }
+    .section-header h2 { font-size: clamp(1.85rem, 3.5vw, 2.6rem); font-weight: 800; line-height: 1.2; margin-bottom: 16px; letter-spacing: -0.02em; }
+    .section-header p { font-size: 1.1rem; color: var(--text-muted); }
 
     /* ── Navbar ── */
     .navbar {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
-      padding: 16px 0;
+      transition: var(--transition);
     }
-    .navbar .container { display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-    .logo:hover { text-decoration: none; }
-    .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; font-weight: 800; }
-    .nav-cta {
-      display: inline-block; background: var(--primary); color: #fff; border: none; padding: 10px 24px;
-      border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;
-      transition: background var(--transition);
-      min-height: 44px; min-width: 44px; /* Touch target */
-      display: flex; align-items: center;
+    .nav-container { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+    
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.45rem; font-weight: 800; letter-spacing: -0.03em;
+      color: var(--text);
     }
-    .nav-cta:hover, .nav-cta:focus { background: var(--primary-dark); text-decoration: none; }
+    .logo-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary) 0%, #312E81 100%);
+      display: flex; align-items: center; justify-content: center;
+      color: #FFFFFF; font-weight: 800; font-size: 1.2rem;
+      box-shadow: 0 4px 10px var(--primary-glow);
+    }
+    .logo span { color: var(--primary); }
 
-    /* ── Hero ── */
-    .hero { padding: 100px 0 80px; text-align: center; background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg) 100%); }
-    .hero-badge {
-      display: inline-block; background: var(--primary); color: #fff;
-      font-size: 0.75rem; font-weight: 600; padding: 6px 16px;
-      border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 24px;
-    }
-    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.15; margin-bottom: 20px; }
-    .hero h1 span { color: var(--primary); }
-    .hero p { font-size: 1.15rem; color: var(--text-light); max-width: 600px; margin: 0 auto 36px; }
-    .hero-cta {
-      display: inline-block; background: var(--primary); color: #fff; padding: 14px 36px;
-      border-radius: 10px; font-weight: 600; font-size: 1.05rem;
-      transition: background var(--transition), transform 0.15s; box-shadow: 0 4px 14px rgba(79,70,229,0.3);
-      min-height: 48px; /* Touch target */
-    }
-    .hero-cta:hover, .hero-cta:focus { background: var(--primary-dark); transform: translateY(-1px); text-decoration: none; }
-    .hero-stats { display: flex; justify-content: center; gap: 48px; margin-top: 56px; flex-wrap: wrap; }
-    .stat { text-align: center; }
-    .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); }
-    .stat-label { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-link { font-size: 0.95rem; font-weight: 600; color: var(--text-muted); transition: var(--transition); }
+    .nav-link:hover, .nav-link:focus-visible { color: var(--primary); }
 
-    /* ── Features ── */
-    .features { background: var(--bg-alt); }
-    .section-header { text-align: center; margin-bottom: 56px; }
-    .section-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
-    .section-header p { font-size: 1.05rem; color: var(--text-light); max-width: 560px; margin: 0 auto; }
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
+    .nav-actions { display: flex; align-items: center; gap: 16px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 22px; border-radius: var(--radius-sm); font-size: 0.925rem; font-weight: 600;
+      border: 1px solid transparent; cursor: pointer; transition: var(--transition);
+      min-height: 44px;
+    }
+    .btn-primary {
+      background: var(--primary); color: #FFFFFF;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-secondary {
+      background: #FFFFFF; color: var(--text); border-color: var(--border);
+    }
+    .btn-secondary:hover { background: var(--bg-alt); border-color: var(--text-subtle); }
+    .btn-lg { padding: 14px 28px; font-size: 1.05rem; border-radius: 10px; min-height: 50px; }
+
+    /* ── Hero Section ── */
+    .hero {
+      position: relative; padding: 80px 0 96px; text-align: center;
+      background: radial-gradient(circle at 50% 0%, #EEF2FF 0%, #FFFFFF 65%);
+      overflow: hidden;
+    }
+    .hero-content { max-width: 820px; margin: 0 auto; }
+    .hero h1 {
+      font-size: clamp(2.35rem, 5.5vw, 3.85rem); font-weight: 800; line-height: 1.15;
+      letter-spacing: -0.03em; margin: 24px 0 20px; color: var(--text);
+    }
+    .hero h1 .gradient-text {
+      background: linear-gradient(135deg, var(--primary) 0%, #06B6D4 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p { font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--text-muted); margin-bottom: 36px; line-height: 1.65; }
+    .hero-buttons { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
+
+    /* Social Proof Bar */
+    .hero-proof {
+      display: flex; align-items: center; justify-content: center; gap: 36px; flex-wrap: wrap;
+      padding-top: 24px; border-top: 1px solid rgba(226, 232, 240, 0.8);
+      font-size: 0.9rem; color: var(--text-muted); font-weight: 500;
+    }
+    .proof-item { display: flex; align-items: center; gap: 8px; }
+    .stars { color: #F59E0B; font-size: 1rem; }
+
+    /* ── Interactive Live Preview Mockup ── */
+    .hero-preview-wrapper {
+      margin-top: 56px; max-width: 1040px; margin-left: auto; margin-right: auto;
+      border-radius: var(--radius-lg); background: #FFFFFF;
+      border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+      overflow: hidden; text-align: left;
+    }
+    .preview-header {
+      background: #F8FAFC; border-bottom: 1px solid var(--border);
+      padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .preview-dots { display: flex; gap: 6px; }
+    .preview-dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+    .preview-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    
+    .preview-body { padding: 24px; display: grid; grid-template-columns: 280px 1fr; gap: 24px; }
+    .preview-sidebar {
+      background: var(--bg-alt); border-radius: var(--radius-sm); padding: 16px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .sidebar-stat { padding: 12px; background: #FFFFFF; border-radius: 8px; border: 1px solid var(--border); }
+    .sidebar-stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+    .sidebar-stat-val { font-size: 1.3rem; font-weight: 800; color: var(--text); margin-top: 2px; }
+
+    .preview-content { display: flex; flex-direction: column; gap: 12px; }
+    .ticket-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border);
+      background: #FFFFFF; transition: var(--transition);
+    }
+    .ticket-row:hover { border-color: var(--primary); transform: translateX(3px); }
+    .ticket-info { display: flex; flex-direction: column; gap: 2px; }
+    .ticket-user { font-weight: 700; font-size: 0.95rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .ticket-desc { font-size: 0.825rem; color: var(--text-muted); }
+    .ticket-meta { display: flex; align-items: center; gap: 12px; font-size: 0.8rem; }
+    .status-pill {
+      padding: 4px 10px; border-radius: 999px; font-weight: 600; font-size: 0.75rem;
+    }
+    .status-new { background: #FEF3C7; color: #92400E; }
+    .status-active { background: #E0E7FF; color: #3730A3; }
+    .status-done { background: #D1FAE5; color: #065F46; }
+
+    /* ── Sector Showcase ── */
+    .sectors { padding: 48px 0; background: #FFFFFF; border-bottom: 1px solid var(--border); }
+    .sectors-label { text-align: center; font-size: 0.875rem; color: var(--text-subtle); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 24px; }
+    .sector-tags { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .sector-tag {
+      padding: 8px 18px; background: var(--bg-alt); border-radius: 999px;
+      font-size: 0.9rem; font-weight: 600; color: var(--text-muted); border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ── Features Grid ── */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; }
     .feature-card {
-      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 32px; transition: box-shadow var(--transition), transform 0.15s;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 36px 30px; transition: var(--transition); display: flex; flex-direction: column;
     }
-    .feature-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-    .feature-icon {
-      width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; margin-bottom: 20px; background: var(--primary-light); color: var(--primary);
+    .feature-card:hover {
+      box-shadow: var(--shadow-hover); border-color: rgba(79, 70, 229, 0.3); transform: translateY(-3px);
     }
-    .feature-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
-    .feature-card p { color: var(--text-light); font-size: 0.95rem; }
+    .feature-icon-box {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: var(--primary-subtle); color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 22px; font-size: 1.5rem;
+    }
+    .feature-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+    .feature-card p { font-size: 0.975rem; color: var(--text-muted); line-height: 1.6; }
 
-    /* ── How it Works ── */
-    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; counter-reset: step; }
-    .step { text-align: center; position: relative; }
-    .step-number {
-      width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: #fff;
-      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem;
-      margin: 0 auto 16px;
+    /* ── How It Works ── */
+    .steps-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; list-style: none; }
+    .step-card {
+      position: relative; background: #FFFFFF; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 32px 24px; text-align: left;
     }
-    .step h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
-    .step p { color: var(--text-light); font-size: 0.9rem; }
+    .step-badge {
+      width: 44px; height: 44px; border-radius: 12px; background: var(--primary); color: #FFFFFF;
+      font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px; box-shadow: 0 4px 10px var(--primary-glow);
+    }
+    .step-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
+    .step-card p { font-size: 0.925rem; color: var(--text-muted); }
 
-    /* ── Form Section ── */
-    .form-section { background: var(--bg-alt); }
-    .form-wrapper {
-      max-width: 560px; margin: 0 auto; background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 40px; box-shadow: var(--shadow);
+    /* ── Testimonials ── */
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; }
+    .testimonial-card {
+      background: #FFFFFF; border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 32px; display: flex; flex-direction: column; justify-content: space-between;
+      box-shadow: var(--shadow-sm);
     }
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-      display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: var(--text);
+    .testimonial-quote { font-size: 1rem; color: var(--text); line-height: 1.6; margin-bottom: 20px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 14px; }
+    .author-avatar {
+      width: 46px; height: 46px; border-radius: 50%; background: var(--primary-subtle);
+      color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
     }
-    .form-group label .required { color: var(--error); }
-    .form-input, .form-select, .form-textarea {
-      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px;
-      font-family: inherit; font-size: 1rem; color: var(--text);
-      transition: border-color var(--transition), box-shadow var(--transition); background: var(--bg);
-      min-height: 48px; /* Touch target – WCAG 2.5.8 */
+    .author-meta strong { display: block; font-size: 0.95rem; color: var(--text); }
+    .author-meta span { font-size: 0.825rem; color: var(--text-muted); }
+
+    /* ── Pricing Section ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; max-width: 1040px; margin: 0 auto; }
+    .pricing-card {
+      background: #FFFFFF; border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 40px 32px; display: flex; flex-direction: column; justify-content: space-between;
+      transition: var(--transition);
     }
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+    .pricing-popular {
+      border-color: var(--primary); box-shadow: var(--shadow-lg); position: relative;
     }
-    .form-input.input-error, .form-select.input-error, .form-textarea.input-error {
-      border-color: var(--error); box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    .pricing-ribbon {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--primary); color: #FFFFFF; padding: 4px 16px; border-radius: 999px;
+      font-size: 0.775rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .form-input.input-valid, .form-select.input-valid, .form-textarea.input-valid {
+    .price-value { font-size: 2.75rem; font-weight: 800; color: var(--text); line-height: 1; margin: 20px 0 8px; }
+    .price-value span { font-size: 1rem; font-weight: 500; color: var(--text-muted); }
+    .pricing-features { list-style: none; margin: 28px 0; display: flex; flex-direction: column; gap: 12px; }
+    .pricing-features li { display: flex; align-items: center; gap: 10px; font-size: 0.925rem; color: var(--text-muted); }
+    .check-icon { color: var(--success); font-weight: 700; }
+
+    /* ── FAQ Section ── */
+    .faq-wrapper { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+    .faq-item {
+      background: #FFFFFF; border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; transition: var(--transition);
+    }
+    .faq-item summary {
+      padding: 22px 24px; font-weight: 700; font-size: 1.05rem; cursor: pointer;
+      list-style: none; display: flex; align-items: center; justify-content: space-between;
+      user-select: none;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-chevron { transition: transform 0.2s ease; font-size: 1.1rem; color: var(--text-subtle); }
+    .faq-item[open] .faq-chevron { transform: rotate(180deg); color: var(--primary); }
+    .faq-content { padding: 0 24px 22px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; border-top: 1px solid var(--bg-alt); padding-top: 16px; }
+
+    /* ── The Application Form Section ── */
+    .form-section-container { max-width: 700px; margin: 0 auto; }
+    .form-box {
+      background: #FFFFFF; border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 44px 40px; box-shadow: var(--shadow-lg);
+    }
+    .form-trust-banner {
+      display: flex; align-items: center; justify-content: center; gap: 20px;
+      padding-bottom: 24px; margin-bottom: 28px; border-bottom: 1px solid var(--border);
+      font-size: 0.85rem; color: var(--text-muted); font-weight: 500;
+    }
+    .trust-pill { display: flex; align-items: center; gap: 6px; }
+
+    .form-group { margin-bottom: 22px; }
+    .form-label {
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 600; font-size: 0.925rem; margin-bottom: 8px; color: var(--text);
+    }
+    .form-label .required { color: var(--error); margin-left: 2px; }
+    
+    .form-control {
+      width: 100%; padding: 13px 18px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 1rem; color: var(--text); background: #FFFFFF;
+      transition: var(--transition); min-height: 48px;
+    }
+    .form-control:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3.5px var(--primary-glow);
+    }
+    .form-control.input-error {
+      border-color: var(--error); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+    }
+    .form-control.input-valid {
       border-color: var(--success);
     }
-    .form-textarea { resize: vertical; min-height: 120px; }
-    .field-error { color: var(--error); font-size: 0.8rem; margin-top: 4px; display: none; font-weight: 500; }
+
+    textarea.form-control { min-height: 125px; resize: vertical; }
+
+    /* Dynamic Service Hint Box */
+    .service-hint-box {
+      display: none; padding: 12px 16px; border-radius: 8px; font-size: 0.875rem;
+      background: var(--primary-subtle); color: #3730A3; border: 1px solid rgba(79, 70, 229, 0.2);
+      margin-top: 8px; line-height: 1.5;
+    }
+    .service-hint-box.visible { display: block; animation: fadeIn 0.2s ease; }
+
+    .field-error {
+      color: var(--error); font-size: 0.825rem; margin-top: 5px; font-weight: 500;
+      display: none;
+    }
     .field-error.visible { display: block; }
-    .char-count { text-align: right; font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
-    .char-count.warning { color: var(--error); font-weight: 600; }
+    .char-count { font-size: 0.8rem; color: var(--text-subtle); }
+    .char-count.warning { color: var(--error); font-weight: 700; }
 
-    /* ── Submit Button ── */
-    .btn-submit {
-      width: 100%; padding: 14px; border: none; border-radius: 10px;
-      background: var(--primary); color: #fff; font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: background var(--transition), opacity var(--transition), transform 0.1s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      min-height: 52px; /* Touch target */
+    /* Alert Message Boxes */
+    .alert-box {
+      padding: 16px 20px; border-radius: 10px; font-size: 0.95rem; font-weight: 500;
+      margin-bottom: 24px; display: none; align-items: flex-start; gap: 12px;
     }
-    .btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
-    .btn-submit:active:not(:disabled) { transform: scale(0.98); }
-    .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
-    .spinner {
-      width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: #fff; border-radius: 50%;
-      animation: spin 0.6s linear infinite; display: none;
-    }
-    .btn-submit.loading .spinner { display: block; }
-    .btn-submit.loading .btn-text { display: none; }
-    .btn-submit.loading .btn-loading-text { display: inline; }
-    .btn-loading-text { display: none; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Alert Messages ── */
-    .alert {
-      padding: 16px 20px; border-radius: 10px; font-size: 0.9rem; font-weight: 500;
-      margin-bottom: 24px; display: none; align-items: flex-start; gap: 10px;
-      animation: fadeSlideIn 0.3s ease;
-    }
-    .alert.visible { display: flex; }
+    .alert-box.visible { display: flex; animation: fadeIn 0.3s ease; }
     .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
     .alert-error { background: var(--error-bg); color: var(--error); border: 1px solid var(--error-border); }
-    .alert-icon { font-size: 1.2rem; flex-shrink: 0; line-height: 1; }
+    .alert-icon { font-size: 1.3rem; flex-shrink: 0; line-height: 1; }
 
-    @keyframes fadeSlideIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
+    .btn-submit-main {
+      width: 100%; padding: 15px; font-size: 1.05rem; font-weight: 700;
+      border-radius: 10px; background: var(--primary); color: #FFFFFF; border: none;
+      cursor: pointer; transition: var(--transition); display: flex; align-items: center;
+      justify-content: center; gap: 10px; box-shadow: 0 4px 14px var(--primary-glow);
+      min-height: 52px;
     }
+    .btn-submit-main:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-submit-main:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-spinner {
+      width: 20px; height: 20px; border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #FFFFFF; border-radius: 50%;
+      animation: spin 0.6s linear infinite; display: none;
+    }
+    .btn-submit-main.loading .btn-spinner { display: block; }
+    .btn-submit-main.loading .btn-text { display: none; }
 
     /* ── Footer ── */
     .footer {
-      text-align: center; padding: 40px 0; border-top: 1px solid var(--border);
-      color: var(--text-light); font-size: 0.85rem;
+      background: #0F172A; color: #94A3B8; padding: 72px 0 36px; font-size: 0.925rem;
     }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 56px; }
+    .footer-brand h4 { color: #FFFFFF; font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; }
+    .footer-brand p { max-width: 320px; line-height: 1.6; }
+    .footer-col h5 { color: #FFFFFF; font-size: 0.975rem; font-weight: 700; margin-bottom: 18px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a:hover { color: #FFFFFF; }
+    .footer-bottom {
+      padding-top: 32px; border-top: 1px solid #1E293B; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 16px; font-size: 0.85rem;
+    }
+    .system-status { display: flex; align-items: center; gap: 8px; color: #10B981; font-weight: 600; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981; }
 
-    /* ── Responsive ── */
-    @media (max-width: 768px) {
-      .section { padding: 56px 0; }
-      .hero { padding: 64px 0 56px; }
-      .hero-stats { gap: 32px; }
-      .form-wrapper { padding: 28px 20px; }
-      .navbar .container { gap: 12px; }
-    }
-    @media (max-width: 480px) {
-      .hero h1 { font-size: 1.7rem; }
-      .hero-stats { flex-direction: column; gap: 20px; }
-      .features-grid { grid-template-columns: 1fr; }
-      .steps-grid { grid-template-columns: 1fr; }
-    }
+    /* ── Animations ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ── Accessibility ── */
-    :focus-visible {
-      outline: 3px solid var(--primary);
-      outline-offset: 2px;
-    }
+    /* ── Accessibility & Media Queries ── */
+    :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
     .sr-only {
-      position: absolute; width: 1px; height: 1px;
-      padding: 0; margin: -1px; overflow: hidden;
-      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
     }
 
-    /* ── Reduced Motion ── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
       }
     }
 
-    /* ── Print ── */
-    @media print {
-      .navbar, .hero-cta, .nav-cta, .btn-submit { display: none; }
-      .hero { background: none; padding: 20px 0; }
-      .section { padding: 20px 0; }
+    @media (max-width: 992px) {
+      .preview-body { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .section { padding: 64px 0; }
+      .nav-links { display: none; }
+      .form-box { padding: 32px 20px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 36px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Skip Navigation – Klavye kullanıcıları için -->
-  <a href="#talep-formu" class="skip-link">İçeriğe geç</a>
+  <!-- Skip Navigation -->
+  <a href="#talep-formu" class="skip-link">Doğrudan Talep Formuna Geç</a>
 
-  <!-- ════ Navbar ════ -->
-  <nav class="navbar" role="navigation" aria-label="Ana navigasyon">
-    <div class="container">
+  <!-- ════ 1. Navbar ════ -->
+  <header class="navbar" role="banner">
+    <div class="container nav-container">
       <a href="#" class="logo" aria-label="PlanPilot Ana Sayfa">
         <div class="logo-icon" aria-hidden="true">P</div>
         PlanPilot
       </a>
-      <a href="#talep-formu" class="nav-cta">Hemen Başla</a>
-    </div>
-  </nav>
 
-  <!-- ════ Ana İçerik ════ -->
+      <nav aria-label="Ana Menü">
+        <ul class="nav-links">
+          <li><a href="#ozellikler" class="nav-link">Özellikler</a></li>
+          <li><a href="#nasil-calisir" class="nav-link">Nasıl Çalışır?</a></li>
+          <li><a href="#onizleme" class="nav-link">Canlı Panel</a></li>
+          <li><a href="#musteriler" class="nav-link">Müşteri Yorumları</a></li>
+          <li><a href="#fiyatlandirma" class="nav-link">Fiyatlar</a></li>
+          <li><a href="#sss" class="nav-link">SSS</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="#talep-formu" class="btn btn-primary">Talep Oluştur</a>
+      </div>
+    </div>
+  </header>
+
   <main id="main-content">
 
-    <!-- ════ Hero ════ -->
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="container">
-        <div class="hero-badge" aria-hidden="true">KOBİ'ler için Tasarlandı</div>
-        <h1 id="hero-title">
-          Müşteri taleplerini<br /><span>tek noktadan yönetin.</span>
+    <!-- ════ 2. Hero Bölümü ════ -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container hero-content">
+        <div class="badge" aria-hidden="true">
+          <span class="badge-dot"></span> KOBİ'ler İçin Akıllı Talep &amp; Randevu Altyapısı
+        </div>
+        
+        <h1 id="hero-heading">
+          Müşteri Taleplerini Kaçırmayın.<br />
+          <span class="gradient-text">Tek Noktadan Toplayın &amp; Yönetin.</span>
         </h1>
+        
         <p>
-          WhatsApp, telefon ve not defteri arasında kaybolmayın.
-          PlanPilot ile gelen talepleri düzenli şekilde alın, takip edin ve hiçbir fırsatı kaçırmayın.
+          WhatsApp mesajları, cevapsız çağrılar ve dağınık not defterleri arasında kaybolmayın.
+          PlanPilot, müşterilerinizin hizmet ve teklif taleplerini saniyeler içinde kalıcı bir kayda dönüştürür.
         </p>
-        <a href="#talep-formu" class="hero-cta">Ücretsiz Talep Oluştur →</a>
 
-        <div class="hero-stats" role="group" aria-label="PlanPilot istatistikleri">
-          <div class="stat">
-            <div class="stat-number" aria-label="İki bin beş yüzden fazla">2,500+</div>
-            <div class="stat-label">Aktif İşletme</div>
+        <div class="hero-buttons">
+          <a href="#talep-formu" class="btn btn-primary btn-lg">Ücretsiz Talep Oluştur →</a>
+          <a href="#onizleme" class="btn btn-secondary btn-lg">Paneli İncele</a>
+        </div>
+
+        <div class="hero-proof">
+          <div class="proof-item">
+            <span class="stars" aria-hidden="true">★★★★★</span>
+            <span><strong>4.9/5</strong> Memnuniyet</span>
           </div>
-          <div class="stat">
-            <div class="stat-number">%98</div>
-            <div class="stat-label">Memnuniyet Oranı</div>
+          <div class="proof-item">
+            <span aria-hidden="true">🏢</span>
+            <span><strong>2,500+</strong> Aktif KOBİ</span>
           </div>
-          <div class="stat">
-            <div class="stat-number" aria-label="Elli binden fazla">50K+</div>
-            <div class="stat-label">İşlenen Talep</div>
+          <div class="proof-item">
+            <span aria-hidden="true">🔒</span>
+            <span><strong>KVKK</strong> &amp; 256-bit Güvenlik</span>
           </div>
+        </div>
+
+        <!-- İnteraktif Panel Önizlemesi (Dashboard Mockup) -->
+        <div class="hero-preview-wrapper" id="onizleme" aria-label="PlanPilot Yönetici Paneli Önizlemesi">
+          <div class="preview-header">
+            <div class="preview-dots" aria-hidden="true">
+              <span class="preview-dot dot-red"></span>
+              <span class="preview-dot dot-yellow"></span>
+              <span class="preview-dot dot-green"></span>
+            </div>
+            <div class="preview-title">
+              <span aria-hidden="true">📊</span> PlanPilot İşletme Portalı · Gelen Talep Akışı
+            </div>
+            <span class="badge" style="font-size:0.75rem; padding:3px 10px;">Canlı Veri</span>
+          </div>
+          
+          <div class="preview-body">
+            <div class="preview-sidebar">
+              <div class="sidebar-stat">
+                <div class="sidebar-stat-label">Bugün Gelen Talepler</div>
+                <div class="sidebar-stat-val">18 Adet</div>
+              </div>
+              <div class="sidebar-stat">
+                <div class="sidebar-stat-label">Ort. Yanıt Süresi</div>
+                <div class="sidebar-stat-val">14 Dakika</div>
+              </div>
+              <div class="sidebar-stat">
+                <div class="sidebar-stat-label">Tamamlanan Kayıtlar</div>
+                <div class="sidebar-stat-val">%98.4</div>
+              </div>
+            </div>
+
+            <div class="preview-content">
+              <div class="ticket-row">
+                <div class="ticket-info">
+                  <div class="ticket-user">
+                    <span>Av. Emre Demir</span>
+                    <span class="status-pill status-new">Yeni Talep</span>
+                  </div>
+                  <div class="ticket-desc">Danışmanlık Randevusu · KVKK &amp; Bilişim Hukuku İncelemesi</div>
+                </div>
+                <div class="ticket-meta">
+                  <span style="color:var(--text-subtle);">Az önce</span>
+                </div>
+              </div>
+
+              <div class="ticket-row">
+                <div class="ticket-info">
+                  <div class="ticket-user">
+                    <span>Selin Aktaş (Mali Müşavirlik)</span>
+                    <span class="status-pill status-active">İnceleniyor</span>
+                  </div>
+                  <div class="ticket-desc">Teklif Talebi · Yıllık E-Dönüşüm &amp; Bordro Otomasyonu</div>
+                </div>
+                <div class="ticket-meta">
+                  <span style="color:var(--text-subtle);">12 dk önce</span>
+                </div>
+              </div>
+
+              <div class="ticket-row">
+                <div class="ticket-info">
+                  <div class="ticket-user">
+                    <span>Caner Öz (TeknoLojistik)</span>
+                    <span class="status-pill status-done">Tamamlandı</span>
+                  </div>
+                  <div class="ticket-desc">Teknik Destek · API Entegrasyon Kurulum Yardımı</div>
+                </div>
+                <div class="ticket-meta">
+                  <span style="color:var(--text-subtle);">1 saat önce</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ════ 3. Sektörel Uyumluluk ════ -->
+    <section class="sectors" aria-label="Hizmet Verilen Sektörler">
+      <div class="container">
+        <div class="sectors-label">Türkiye Genelinde Farklı Sektörlerin Tercihi</div>
+        <div class="sector-tags">
+          <div class="sector-tag"><span aria-hidden="true">⚖️</span> Hukuk Büroları</div>
+          <div class="sector-tag"><span aria-hidden="true">🩺</span> Diş &amp; Sağlık Klinikleri</div>
+          <div class="sector-tag"><span aria-hidden="true">📊</span> Mali Müşavirler</div>
+          <div class="sector-tag"><span aria-hidden="true">💻</span> Yazılım &amp; Tasarım Ajansları</div>
+          <div class="sector-tag"><span aria-hidden="true">🔧</span> Teknik Servis &amp; Bakım</div>
         </div>
       </div>
     </section>
 
-    <!-- ════ Özellikler ════ -->
-    <section class="section features" aria-labelledby="features-title">
+    <!-- ════ 4. Özellikler Bölümü ════ -->
+    <section class="section section-alt" id="ozellikler" aria-labelledby="features-heading">
       <div class="container">
         <div class="section-header">
-          <h2 id="features-title">Neden PlanPilot?</h2>
-          <p>Küçük işletmelerin en büyük sorunu: dağınık müşteri talepleri. Biz bunu çözüyoruz.</p>
+          <div class="badge" style="margin-bottom:12px;">Yetkinlikler</div>
+          <h2 id="features-heading">İşletmenizin İhtiyacı Olan Tüm Talep Altyapısı</h2>
+          <p>Müşteri kaybını önleyen, ekibinize zaman kazandıran modern iş akışları.</p>
         </div>
+
         <div class="features-grid">
-          <article class="feature-card">
-            <div class="feature-icon" role="img" aria-label="Form ikonu">📋</div>
-            <h3>Tek Sayfa, Tüm Talepler</h3>
-            <p>Müşterileriniz tek bir form üzerinden randevu, teklif ve destek taleplerini kolayca iletir.</p>
-          </article>
-          <article class="feature-card">
-            <div class="feature-icon" role="img" aria-label="Bildirim ikonu">🔔</div>
-            <h3>Anında Bildirim</h3>
-            <p>Her yeni talep geldiğinde anında e-posta bildirimi alın. Hiçbir müşteri yanıtsız kalmaz.</p>
-          </article>
-          <article class="feature-card">
-            <div class="feature-icon" role="img" aria-label="Grafik ikonu">📊</div>
-            <h3>Takip &amp; Raporlama</h3>
-            <p>Gelen talepleri durumlarına göre takip edin. Haftalık raporlarla işinizi büyütün.</p>
-          </article>
+          <div class="feature-card">
+            <div class="feature-icon-box" aria-hidden="true">📥</div>
+            <h3>Merkezi Talep Toplama</h3>
+            <p>Web sitenizden, sosyal medyadan veya doğrudan bağlantıdan gelen tüm talepleri tek bir güvenli veritabanında toplayın.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box" aria-hidden="true">⚡</div>
+            <h3>Anında Doğrulama &amp; Kayıt</h3>
+            <p>Eksik veya hatalı veri girişini hem tarayıcıda hem sunucuda anlık engelleyin. Geçerli her talep anında kalıcı kayda dönüşür.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box" aria-hidden="true">🔔</div>
+            <h3>Müşteri Teyit Bildirimi</h3>
+            <p>Talep iletildiği anda müşteriye özel takip numarası verilir. Müşteriniz talebinin ulaştığından emin olur.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box" aria-hidden="true">🛡️</div>
+            <h3>KVKK ve Veri Güvenliği</h3>
+            <p>Müşteri verileri 256-bit şifreleme ve sıkı güvenlik başlıkları (CSP, Helmet, Rate Limiting) ile korunur.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box" aria-hidden="true">📱</div>
+            <h3>%100 Mobil &amp; Tablet Uyumu</h3>
+            <p>Hem müşterileriniz için form deneyimi hem işletmeniz için yönetim paneli her ekran boyutunda kusursuz çalışır.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon-box" aria-hidden="true">📈</div>
+            <h3>Performans &amp; Dönüşüm Raporu</h3>
+            <p>Hangi hizmete ne kadar talep geldiğini, yanıt sürelerinizi ve haftalık büyüme trendinizi anlık takip edin.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ════ Nasıl Çalışır ════ -->
-    <section class="section" aria-labelledby="steps-title">
+    <!-- ════ 5. Nasıl Çalışır? ════ -->
+    <section class="section" id="nasil-calisir" aria-labelledby="steps-heading">
       <div class="container">
         <div class="section-header">
-          <h2 id="steps-title">Nasıl Çalışır?</h2>
-          <p>Üç basit adımda müşteri taleplerini düzene sokun.</p>
+          <div class="badge" style="margin-bottom:12px;">Süreç</div>
+          <h2 id="steps-heading">3 Basit Adımda Düzenli Talep Yönetimi</h2>
+          <p>Karmaşık yazılımlar öğrenmenize gerek yok; PlanPilot ilk dakikadan itibaren hazırdır.</p>
         </div>
-        <ol class="steps-grid" role="list">
-          <li class="step">
-            <div class="step-number" aria-hidden="true">1</div>
-            <h3>Sayfanızı Paylaşın</h3>
-            <p>PlanPilot bağlantınızı müşterilerinize gönderin veya web sitenize ekleyin.</p>
+
+        <ol class="steps-container">
+          <li class="step-card">
+            <div class="step-badge">1</div>
+            <h3>Formunuzu Yayınlayın</h3>
+            <p>PlanPilot sayfanızı müşterilerinizle paylaşın, web sitenize veya Instagram biyografinize ekleyin.</p>
           </li>
-          <li class="step">
-            <div class="step-number" aria-hidden="true">2</div>
-            <h3>Talepler Gelsin</h3>
-            <p>Müşteriler formu doldursun; tüm bilgiler güvenle kaydedilsin.</p>
+          <li class="step-card">
+            <div class="step-badge">2</div>
+            <h3>Müşteri Bilgisini Girsin</h3>
+            <p>Müşteriniz adını, e-postasını, istediği hizmeti ve notunu doğrulanmış güvenli forma yazsın.</p>
           </li>
-          <li class="step">
-            <div class="step-number" aria-hidden="true">3</div>
-            <h3>Yönetin &amp; Büyüyün</h3>
-            <p>Talepleri görüntüleyin, yanıtlayın ve işinizi ölçeklendirin.</p>
+          <li class="step-card">
+            <div class="step-badge">3</div>
+            <h3>Sunucuda Güvenle Saklansın</h3>
+            <p>Kayıt sunucuya işlenir, takip kimliği üretilir ve talebiniz anında incelenmeye hazır hale gelir.</p>
+          </li>
+          <li class="step-card">
+            <div class="step-badge">4</div>
+            <h3>İşinizi Büyütün</h3>
+            <p>Hızlı ve kurumsal geri dönüş yaparak müşteri sadakatini ve satış dönüşümünüzü artırın.</p>
           </li>
         </ol>
       </div>
     </section>
 
-    <!-- ════ Talep Formu ════ -->
-    <section class="section form-section" id="talep-formu" aria-labelledby="form-title">
+    <!-- ════ 6. Müşteri Yorumları ════ -->
+    <section class="section section-alt" id="musteriler" aria-labelledby="testimonials-heading">
       <div class="container">
         <div class="section-header">
-          <h2 id="form-title">Hizmet Talebi Oluşturun</h2>
-          <p>Formu doldurun, size en kısa sürede dönüş yapalım.</p>
+          <div class="badge" style="margin-bottom:12px;">Referanslar</div>
+          <h2 id="testimonials-heading">İşletmeler PlanPilot Hakkında Ne Diyor?</h2>
+          <p>Farklı sektörlerden binlerce KOBİ'nin günlük operasyonlarını nasıl kolaylaştırdığımızı inceleyin.</p>
         </div>
 
-        <div class="form-wrapper">
-          <!-- Uyarı Mesajları -->
-          <div class="alert alert-success" id="alert-success" role="alert" aria-live="assertive">
-            <span class="alert-icon" aria-hidden="true">✅</span>
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
             <div>
-              <strong>Talebiniz başarıyla gönderildi!</strong><br />
-              <span id="success-detail">En kısa sürede sizinle iletişime geçeceğiz.</span>
+              <div class="stars" style="margin-bottom:12px;" aria-label="5 yıldız">★★★★★</div>
+              <p class="testimonial-quote">"Önceden WhatsApp'ta kaybolan dava ve danışmanlık taleplerimizi artık tek bir ekranda görüyoruz. Yanıt süremiz 4 saatten 20 dakikaya indi."</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar" aria-hidden="true">MÇ</div>
+              <div class="author-meta">
+                <strong>Av. Murat Çetin</strong>
+                <span>Çetin Hukuk &amp; Danışmanlık</span>
+              </div>
             </div>
           </div>
-          <div class="alert alert-error" id="alert-error" role="alert" aria-live="assertive">
+
+          <div class="testimonial-card">
+            <div>
+              <div class="stars" style="margin-bottom:12px;" aria-label="5 yıldız">★★★★★</div>
+              <p class="testimonial-quote">"Hastalarımızın web sitemizden randevu oluşturması çok pratikleşti. Eksik telefon veya yanlış mail girilmesini anında engellemesi harika."</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar" aria-hidden="true">SA</div>
+              <div class="author-meta">
+                <strong>Dt. Selin Aksoy</strong>
+                <span>Aksoy Diş Sağlığı Polikliniği</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <div>
+              <div class="stars" style="margin-bottom:12px;" aria-label="5 yıldız">★★★★★</div>
+              <p class="testimonial-quote">"Yazılım ve danışmanlık teklif taleplerini toplamak için kullandığımız en temiz araç. Hiçbir karmaşık eğitim gerekmeden ekibe kurduk."</p>
+            </div>
+            <div class="testimonial-author">
+              <div class="author-avatar" aria-hidden="true">KD</div>
+              <div class="author-meta">
+                <strong>Kerem Demir</strong>
+                <span>Demir Dijital Çözümler</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ 7. Fiyatlandırma ════ -->
+    <section class="section" id="fiyatlandirma" aria-labelledby="pricing-heading">
+      <div class="container">
+        <div class="section-header">
+          <div class="badge" style="margin-bottom:12px;">Şeffaf Fiyatlandırma</div>
+          <h2 id="pricing-heading">Gizli Maliyet Yok, İhtiyacınıza Uygun Planlar</h2>
+          <p>Kredi kartı gerekmeden ücretsiz başlayın, işiniz büyüdükçe ölçeklendirin.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div>
+              <h3>Başlangıç</h3>
+              <p style="color:var(--text-muted); font-size:0.9rem;">Bireysel çalışanlar ve yeni KOBİ'ler için</p>
+              <div class="price-value">₺0 <span>/ süresiz</span></div>
+              <ul class="pricing-features">
+                <li><span class="check-icon">✓</span> Aylık 100 Talep Kaydı</li>
+                <li><span class="check-icon">✓</span> Standart Doğrulanmış Form</li>
+                <li><span class="check-icon">✓</span> E-posta Bildirim Desteği</li>
+                <li><span class="check-icon">✓</span> 7 Günlük Veri Saklama</li>
+              </ul>
+            </div>
+            <a href="#talep-formu" class="btn btn-secondary" style="width:100%;">Hemen Başla</a>
+          </div>
+
+          <div class="pricing-card pricing-popular">
+            <div class="pricing-ribbon">En Çok Tercih Edilen</div>
+            <div>
+              <h3>Profesyonel</h3>
+              <p style="color:var(--text-muted); font-size:0.9rem;">Hızlı büyüyen işletmeler ve klinikler</p>
+              <div class="price-value">₺349 <span>/ ay</span></div>
+              <ul class="pricing-features">
+                <li><span class="check-icon">✓</span> <strong>Sınırsız</strong> Talep Toplama</li>
+                <li><span class="check-icon">✓</span> Özel Alan Adı Desteği</li>
+                <li><span class="check-icon">✓</span> Anlık SMS &amp; E-posta Teyidi</li>
+                <li><span class="check-icon">✓</span> Sınırsız Veri Saklama &amp; Dışa Aktarma</li>
+                <li><span class="check-icon">✓</span> Öncelikli 7/24 Teknik Destek</li>
+              </ul>
+            </div>
+            <a href="#talep-formu" class="btn btn-primary" style="width:100%;">14 Gün Ücretsiz Dene</a>
+          </div>
+
+          <div class="pricing-card">
+            <div>
+              <h3>Kurumsal</h3>
+              <p style="color:var(--text-muted); font-size:0.9rem;">Çok şubeli işletmeler ve ofisler</p>
+              <div class="price-value">₺890 <span>/ ay</span></div>
+              <ul class="pricing-features">
+                <li><span class="check-icon">✓</span> Çoklu Şube &amp; Ekip Yönetimi</li>
+                <li><span class="check-icon">✓</span> Özel API &amp; Webhook Bağlantısı</li>
+                <li><span class="check-icon">✓</span> Özel SLA &amp; Veri Güvenliği Protokolü</li>
+                <li><span class="check-icon">✓</span> Kurumsal Entegrasyon Danışmanlığı</li>
+              </ul>
+            </div>
+            <a href="#talep-formu" class="btn btn-secondary" style="width:100%;">Bize Ulaşın</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ 8. SSS (Sıkça Sorulan Sorular) ════ -->
+    <section class="section section-alt" id="sss" aria-labelledby="faq-heading">
+      <div class="container">
+        <div class="section-header">
+          <div class="badge" style="margin-bottom:12px;">Merak Edilenler</div>
+          <h2 id="faq-heading">Sıkça Sorulan Sorular</h2>
+          <p>Aklınıza takılan soruların yanıtlarını derledik.</p>
+        </div>
+
+        <div class="faq-wrapper">
+          <details class="faq-item">
+            <summary>
+              <span>PlanPilot'ı kendi web siteme nasıl entegre edebilirim?</span>
+              <span class="faq-chevron" aria-hidden="true">▼</span>
+            </summary>
+            <div class="faq-content">
+              PlanPilot sayfa bağlantınızı doğrudan sosyal medya hesaplarınıza, Google İşletme profilinize ekleyebilir veya sitenizdeki "İletişim / Teklif Al" butonuna yönlendirme olarak tanımlayabilirsiniz.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>
+              <span>Toplanan veriler KVKK gerekliliklerine uygun mu?</span>
+              <span class="faq-chevron" aria-hidden="true">▼</span>
+            </summary>
+            <div class="faq-content">
+              Evet. Tüm form verileri sunucu tarafında temizlenir, şifreli HTTPS kanalı üzerinden aktarılır ve üçüncü taraf izleyicilerle paylaşılmaz.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>
+              <span>Yeni bir talep geldiğinde nasıl haberdar olurum?</span>
+              <span class="faq-chevron" aria-hidden="true">▼</span>
+            </summary>
+            <div class="faq-content">
+              Müşteri formu onayladığı anda sistem yöneticisine anlık e-posta bildirimi gönderilir. Aynı zamanda yönetim panelindeki sayaç güncellenir.
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>
+              <span>Hatalı veya eksik form gönderiminde ne olur?</span>
+              <span class="faq-chevron" aria-hidden="true">▼</span>
+            </summary>
+            <div class="faq-content">
+              PlanPilot hem tarayıcıda hem sunucuda çift katmanlı doğrulama yapar. Geçersiz e-posta veya eksik açıklama girilirse kullanıcı ilgili alana anında yönlendirilir ve hatalı veri sunucuya kaydedilmez.
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ 9. Hizmet Talep Formu (Temel Görev Bileşeni) ════ -->
+    <section class="section" id="talep-formu" aria-labelledby="form-heading">
+      <div class="container form-section-container">
+        <div class="section-header">
+          <div class="badge" style="margin-bottom:12px;">Hemen İletişime Geçin</div>
+          <h2 id="form-heading">Hizmet Talebi Oluşturun</h2>
+          <p>Formu doldurun; talebiniz güvenle sunucumuza kaydedilsin ve size özel takip numarası üretilsin.</p>
+        </div>
+
+        <div class="form-box">
+          <div class="form-trust-banner">
+            <div class="trust-pill"><span aria-hidden="true">🔒</span> 256-Bit SSL Koruma</div>
+            <div class="trust-pill"><span aria-hidden="true">⚡</span> Ortalama Yanıt: 15 Dk</div>
+            <div class="trust-pill"><span aria-hidden="true">🛡️</span> Spam Korumalı</div>
+          </div>
+
+          <!-- Başarı Uyarısı -->
+          <div class="alert-box alert-success" id="alert-success" role="alert" aria-live="assertive" tabindex="-1">
+            <span class="alert-icon" aria-hidden="true">✅</span>
+            <div>
+              <strong>Talebiniz Başarıyla Kaydedildi!</strong><br />
+              <span id="success-detail">İşletme yetkilimiz en kısa sürede sizinle iletişime geçecektir.</span>
+            </div>
+          </div>
+
+          <!-- Hata Uyarısı -->
+          <div class="alert-box alert-error" id="alert-error" role="alert" aria-live="assertive" tabindex="-1">
             <span class="alert-icon" aria-hidden="true">❌</span>
-            <div id="error-message">Bir hata oluştu. Lütfen tekrar deneyin.</div>
+            <div>
+              <strong>Lütfen aşağıdaki hataları düzeltin:</strong>
+              <div id="error-message" style="margin-top:6px;"></div>
+            </div>
           </div>
 
           <form id="request-form" novalidate>
+            <!-- 1. Ad Soyad -->
             <div class="form-group">
-              <label for="full_name">Ad Soyad <span class="required" aria-hidden="true">*</span><span class="sr-only">(zorunlu)</span></label>
+              <label for="full_name" class="form-label">
+                <span>Ad Soyad <span class="required" aria-hidden="true">*</span></span>
+                <span class="sr-only">(zorunlu alan)</span>
+              </label>
               <input
-                type="text" id="full_name" name="full_name" class="form-input"
-                placeholder="Örn: Ayşe Yılmaz" required minlength="2" maxlength="100"
+                type="text" id="full_name" name="full_name" class="form-control"
+                placeholder="Örn: Mehmet Öztürk" required minlength="2" maxlength="100"
                 autocomplete="name" aria-describedby="full_name-error" aria-required="true"
               />
               <div class="field-error" id="full_name-error" role="alert" aria-live="polite"></div>
             </div>
 
+            <!-- 2. E-posta -->
             <div class="form-group">
-              <label for="email">E-posta <span class="required" aria-hidden="true">*</span><span class="sr-only">(zorunlu)</span></label>
+              <label for="email" class="form-label">
+                <span>E-posta Adresi <span class="required" aria-hidden="true">*</span></span>
+                <span class="sr-only">(zorunlu alan)</span>
+              </label>
               <input
-                type="email" id="email" name="email" class="form-input"
-                placeholder="Örn: ayse@firma.com" required maxlength="254"
+                type="email" id="email" name="email" class="form-control"
+                placeholder="Örn: mehmet@sirketiniz.com" required maxlength="254"
                 autocomplete="email" aria-describedby="email-error" aria-required="true"
               />
               <div class="field-error" id="email-error" role="alert" aria-live="polite"></div>
             </div>
 
+            <!-- 3. Hizmet Türü Seçimi -->
             <div class="form-group">
-              <label for="service_type">Hizmet Türü <span class="required" aria-hidden="true">*</span><span class="sr-only">(zorunlu)</span></label>
-              <select id="service_type" name="service_type" class="form-select" required aria-describedby="service_type-error" aria-required="true">
-                <option value="">-- Hizmet seçiniz --</option>
+              <label for="service_type" class="form-label">
+                <span>İlgilendiğiniz Hizmet Türü <span class="required" aria-hidden="true">*</span></span>
+                <span class="sr-only">(zorunlu alan)</span>
+              </label>
+              <select id="service_type" name="service_type" class="form-control" required aria-describedby="service_type-error" aria-required="true">
+                <option value="">-- Lütfen bir hizmet seçiniz --</option>
                 <option value="danismanlik">Danışmanlık Randevusu</option>
                 <option value="teklif">Teklif Talebi</option>
-                <option value="teknik-destek">Teknik Destek</option>
-                <option value="genel-bilgi">Genel Bilgi Talebi</option>
+                <option value="teknik-destek">Teknik Destek &amp; Entegrasyon</option>
+                <option value="genel-bilgi">Genel Bilgi &amp; Ön Görüşme</option>
               </select>
+              <div class="service-hint-box" id="service-hint-box"></div>
               <div class="field-error" id="service_type-error" role="alert" aria-live="polite"></div>
             </div>
 
+            <!-- 4. Açıklama -->
             <div class="form-group">
-              <label for="description">Açıklama <span class="required" aria-hidden="true">*</span><span class="sr-only">(zorunlu)</span></label>
+              <div class="form-label">
+                <label for="description">
+                  Talebinizin Detayları <span class="required" aria-hidden="true">*</span>
+                  <span class="sr-only">(zorunlu alan)</span>
+                </label>
+                <span class="char-count" id="description-charcount" aria-live="polite" aria-atomic="true">0 / 1000</span>
+              </div>
               <textarea
-                id="description" name="description" class="form-textarea"
-                placeholder="Talebinizi kısaca açıklayın..." required minlength="10" maxlength="1000"
+                id="description" name="description" class="form-control"
+                placeholder="İhtiyacınızı, tarih tercihlerinizi veya sormak istediklerinizi kısaca belirtiniz..."
+                required minlength="10" maxlength="1000"
                 aria-describedby="description-error description-charcount" aria-required="true"
               ></textarea>
-              <div class="char-count" id="description-charcount" aria-live="polite" aria-atomic="true">0 / 1000</div>
               <div class="field-error" id="description-error" role="alert" aria-live="polite"></div>
             </div>
 
-            <button type="submit" class="btn-submit" id="btn-submit" aria-busy="false">
-              <span class="spinner" aria-hidden="true"></span>
-              <span class="btn-text">Talebi Gönder</span>
-              <span class="btn-loading-text">Gönderiliyor...</span>
+            <!-- Gönder Butonu -->
+            <button type="submit" class="btn-submit-main" id="btn-submit" aria-busy="false">
+              <span class="btn-spinner" aria-hidden="true"></span>
+              <span class="btn-text">Talebi Güvenle Gönder →</span>
             </button>
           </form>
         </div>
@@ -441,10 +960,48 @@
 
   </main>
 
-  <!-- ════ Footer ════ -->
+  <!-- ════ 10. Footer ════ -->
   <footer class="footer" role="contentinfo">
     <div class="container">
-      <p>&copy; 2026 PlanPilot. Tüm hakları saklıdır. <span aria-hidden="true">·</span> <small>Kurgusal hizmettir</small></p>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h4>PlanPilot</h4>
+          <p>KOBİ'lerin müşteri taleplerini, randevularını ve teklif süreçlerini tek noktadan yönetmesini sağlayan akıllı altyapı çözümü.</p>
+        </div>
+        <div class="footer-col">
+          <h5>Ürün</h5>
+          <ul class="footer-links">
+            <li><a href="#ozellikler">Özellikler</a></li>
+            <li><a href="#nasil-calisir">Nasıl Çalışır?</a></li>
+            <li><a href="#onizleme">Canlı Demo</a></li>
+            <li><a href="#fiyatlandirma">Fiyatlandırma</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Kurumsal</h5>
+          <ul class="footer-links">
+            <li><a href="#musteriler">Müşteri Yorumları</a></li>
+            <li><a href="#sss">Sıkça Sorulanlar</a></li>
+            <li><a href="#talep-formu">İletişim</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Yasal &amp; Güvenlik</h5>
+          <ul class="footer-links">
+            <li><a href="#talep-formu">KVKK Aydınlatma Metni</a></li>
+            <li><a href="#talep-formu">Gizlilik Politikası</a></li>
+            <li><a href="#talep-formu">Kullanım Koşulları</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 PlanPilot Teknolojileri. Tüm hakları saklıdır. (Kurgusal Servis Değerlendirme Projesi)</div>
+        <div class="system-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Tüm Sistemler Operasyonel (v2.2)</span>
+        </div>
+      </div>
     </div>
   </footer>
 

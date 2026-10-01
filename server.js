@@ -1,3 +1,13 @@
+/**
+ * PlanPilot – Express Sunucusu & Güvenli API Ağ Geçidi
+ * 
+ * Güvenlik Katmanı:
+ * - Helmet ile özelleştirilmiş CSP, HSTS, X-Content-Type-Options
+ * - express-rate-limit ile kaba kuvvet ve DDoS önleme
+ * - XSS temizleme ve sıkı girdi doğrulaması
+ * - JSON istek gövdesi boyut kısıtlaması (10 KB)
+ */
+
 const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -7,7 +17,7 @@ const db = require('./database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Güvenlik ──
+// ── 1. Güvenlik Başlıkları (Helmet CSP) ──
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -21,34 +31,49 @@ app.use(helmet({
   }
 }));
 
-// ── Rate Limiting ──
+// ── 2. Hız Sınırlayıcılar (Rate Limiting) ──
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 15 * 60 * 1000, // 15 dakika
   max: 50,
-  message: { success: false, errors: ['Çok fazla istek gönderdiniz. Lütfen 15 dakika sonra tekrar deneyin.'] },
+  message: {
+    success: false,
+    errors: ['Çok fazla istek gönderdiniz. Lütfen 15 dakika sonra tekrar deneyin.']
+  },
   standardHeaders: true,
   legacyHeaders: false
 });
 
-// ── Middleware ──
+// İstatistikler için daha gevşek hız sınırı
+const statsLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 100,
+  message: { success: false, errors: ['İstek sınırı aşıldı.'] }
+});
+
+// ── 3. Temel Ara Yazılımlar ──
 app.use(express.json({ limit: '10kb' }));
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '1d',
   etag: true
 }));
 
-// ── Doğrulama Yardımcıları ──
+// ── 4. Doğrulama & Temizleme Yardımcıları ──
 function validateEmail(email) {
   if (typeof email !== 'string') return false;
   const trimmed = email.trim();
   if (trimmed.length > 254) return false;
+  // RFC 5322 genel geçer doğrulaması
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(trimmed.toLowerCase());
 }
 
 function sanitize(str) {
   if (typeof str !== 'string') return '';
-  return str.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return str.trim()
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
 }
 
 const VALID_SERVICES = [
@@ -61,26 +86,29 @@ const VALID_SERVICES = [
 function validateRequest(body) {
   const errors = [];
 
-  // Ham değer üzerinde uzunluk kontrolü (sanitize öncesi)
   const rawName = typeof body.full_name === 'string' ? body.full_name.trim() : '';
   const rawEmail = typeof body.email === 'string' ? body.email.trim() : '';
   const rawService = typeof body.service_type === 'string' ? body.service_type.trim() : '';
   const rawDesc = typeof body.description === 'string' ? body.description.trim() : '';
 
+  // İsim kontrolü
   if (!rawName || rawName.length < 2) {
     errors.push('Ad soyad en az 2 karakter olmalıdır.');
   } else if (rawName.length > 100) {
     errors.push('Ad soyad en fazla 100 karakter olabilir.');
   }
 
+  // E-posta kontrolü
   if (!rawEmail || !validateEmail(rawEmail)) {
     errors.push('Geçerli bir e-posta adresi giriniz.');
   }
 
+  // Hizmet türü kontrolü
   if (!rawService || !VALID_SERVICES.includes(rawService)) {
     errors.push('Geçerli bir hizmet türü seçiniz.');
   }
 
+  // Açıklama kontrolü
   if (!rawDesc || rawDesc.length < 10) {
     errors.push('Açıklama en az 10 karakter olmalıdır.');
   } else if (rawDesc.length > 1000) {
@@ -90,9 +118,9 @@ function validateRequest(body) {
   return { errors, rawName, rawEmail, rawService, rawDesc };
 }
 
-// ── API Rotaları ──
+// ── 5. API Uç Noktaları ──
 
-// POST /api/requests – Yeni talep oluştur
+// POST /api/requests – Yeni talep kaydet
 app.post('/api/requests', apiLimiter, (req, res) => {
   try {
     const { errors, rawName, rawEmail, rawService, rawDesc } = validateRequest(req.body);
@@ -101,20 +129,20 @@ app.post('/api/requests', apiLimiter, (req, res) => {
       return res.status(400).json({ success: false, errors });
     }
 
-    const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+    const clientIp = req.ip || req.socket?.remoteAddress || 'unknown';
 
     const saved = db.insertRequest({
       full_name: sanitize(rawName),
-      email: rawEmail, // E-posta sanitize edilmez, doğrulama yeterli
-      service_type: rawService, // Whitelist'te zaten kontrol edildi
+      email: rawEmail,
+      service_type: rawService,
       description: sanitize(rawDesc),
-      ip_address: ip
+      ip_address: clientIp
     });
 
-    if (!saved) {
+    if (!saved || !saved.id) {
       return res.status(500).json({
         success: false,
-        errors: ['Kayıt doğrulanamadı. Lütfen tekrar deneyin.']
+        errors: ['Kayıt işlemi doğrulanamadı. Lütfen tekrar deneyin.']
       });
     }
 
@@ -123,42 +151,61 @@ app.post('/api/requests', apiLimiter, (req, res) => {
       message: 'Talebiniz başarıyla kaydedildi!',
       data: {
         id: saved.id,
-        created_at: saved.created_at
+        created_at: saved.created_at,
+        service_type: saved.service_type
       }
     });
   } catch (err) {
-    console.error('POST /api/requests hatası:', err.message);
+    console.error('❌ POST /api/requests hatası:', err.message);
     return res.status(500).json({
       success: false,
-      errors: ['Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.']
+      errors: ['Sunucu tarafında bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.']
     });
   }
 });
 
-// GET /api/health – Sağlık kontrolü
+// GET /api/stats – Canlı sistem istatistikleri
+app.get('/api/stats', statsLimiter, (req, res) => {
+  try {
+    const stats = db.getStats();
+    res.json({
+      success: true,
+      stats: {
+        total_requests: stats.total,
+        distribution: stats.distribution,
+        uptime_seconds: stats.uptime_seconds
+      }
+    });
+  } catch (err) {
+    console.error('❌ GET /api/stats hatası:', err.message);
+    res.status(500).json({ success: false, message: 'İstatistikler alınamadı.' });
+  }
+});
+
+// GET /api/health – Canlılık kontrolü
 app.get('/api/health', (req, res) => {
   try {
     const total = db.getCount();
     res.json({ status: 'ok', total_requests: total });
   } catch (err) {
-    console.error('Health check hatası:', err.message);
+    console.error('❌ Health check hatası:', err.message);
     res.status(500).json({ status: 'error', message: 'Sunucu hatası' });
   }
 });
 
-// ── API 404 – Bilinmeyen API rotaları ──
+// ── 6. API 404 Koruması ──
 app.all('/api/*', (req, res) => {
-  res.status(404).json({ success: false, errors: ['API endpoint bulunamadı.'] });
+  res.status(404).json({ success: false, errors: ['İstenen API uç noktası bulunamadı.'] });
 });
 
-// ── SPA Fallback ──
+// ── 7. SPA HTML Geri Dönüşü ──
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ── Sunucuyu Başlat ──
+// ── 8. Sunucuyu Başlat ──
 app.listen(PORT, () => {
-  console.log(`✅ PlanPilot sunucusu çalışıyor: http://localhost:${PORT}`);
+  console.log(`✅ PlanPilot sunucusu hazır: http://localhost:${PORT}`);
 });
 
 module.exports = app;

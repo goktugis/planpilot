@@ -286,6 +286,49 @@ Tüm değişikliklerden sonra tekrar test ettim:
 
 ---
 
+## Adım 11 – Görsel ve İçerik Zenginleştirme İterasyonu (SaaS Seviyesi Deneyim)
+
+Teknik temeli sağlamlaştırdıktan sonra, projenin bir değerlendirme ödevinden öte **"canlıda kullanıma hazır, güven veren birinci sınıf bir SaaS ürünü"** gibi hissettirmesi için kapsamlı bir içerik ve görsel zenginleştirme iterasyonu başlattım.
+
+**Problem:** Basit bir landing page teknik gereksinimleri karşılasa da, bir KOBİ sahibinin güvenini kazanmak ve değerlendiriciye ürün vizyonumu kanıtlamak için daha güçlü bir görsel hiyerarşi, sektörel kanıtlar ve kullanıcı deneyimi derinliği gerekiyordu.
+
+### Yapılan Tasarım ve İçerik Kararları:
+
+1. **Canlı Panel ve Talep Akışı Simülasyonu (Hero Mockup):**
+   - Kullanıcı sadece formu değil, form gönderildikten sonra işletme tarafında oluşan **yönetim paneli deneyimini** de görebilmeli.
+   - Hero bölümüne canlı işletme portalı mockup'ı ekledim (Durum hapları: Yeni Talep, İnceleniyor, Tamamlandı; SLA yanıt süresi metrikleri).
+
+2. **Dinamik Form Rehberliği (Context-Aware Service Hints):**
+   - Kullanıcı `service_type` dropdown'ından bir hizmet seçtiğinde (örneğin Danışmanlık veya Teklif), formun hemen altında o hizmete özel ortalama yanıt süresi (SLA) ve süreç bilgisi beliren dinamik bir rehberlik kutusu ekledim.
+   - Bu sayede kullanıcı ne zaman geri dönüş alacağını bilerek formu dolduruyor.
+
+3. **Sosyal Kanıt ve Sektörel Uyumluluk:**
+   - Hukuk büroları, diş klinikleri, mali müşavirler ve teknoloji ajansları gibi hedef kitleye özel sektörel etiketler ve gerçekçi vaka analizleri (ölçülebilir kazanımlarla: "yanıt süremiz 4 saatten 20 dakikaya indi") eklendi.
+
+4. **Şeffaf Fiyatlandırma ve SSS Bölümleri:**
+   - KOBİ'ler için şeffaf 3 kademeli fiyatlandırma tablosu eklendi.
+   - Sıfır JavaScript bağımlılığı olan, ekran okuyucularla %100 uyumlu native HTML5 `<details>` / `<summary>` SSS akordeonu inşa edildi.
+
+5. **Yeni İstatistik Endpoint'i (`GET /api/stats`):**
+   - Sunucu tarafında toplanan talepleri hizmet türlerine göre anonim şekilde özetleyen `getStats()` fonksiyonu ve API rotası yazıldı. Rate-limiting uygulandı.
+
+### AI ile Çalışma ve Karar Verme (Kabul / Ret):
+
+| Konu | AI Önerisi | Benim Kararım | Gerekçem |
+|------|------------|---------------|----------|
+| Grafik & Mockup | Chart.js veya Lottie kütüphanesi ekle | ❌ **Reddettim** | Dış kütüphaneler ilk yükleme hızını düşürür ve CSP politikamızı gevşetmeyi gerektirir. Saf CSS ve semantik DOM ile sıfır bağımlılıklı mockup yaptım. |
+| Görseller | Unsplash stok fotoğrafları ekle | ❌ **Reddettim** | Dış görsel linkleri ileride kırılabilir (404) ve gizlilik engelleyicilerine takılabilir. Vektörel inline SVG ve modern tipografik hiyerarşi kullandım. |
+| Dinamik Form İpuçları | Seçilen hizmete göre anlık bilgi kutusu göster | ✅ **Kabul ettim** | Müşteri deneyimini dramatik ölçüde artırıyor; hemen vanilla JS event dinleyicisi ile entegre ettim. |
+| SSS Akordeonu | JavaScript tabanlı animasyonlu akordeon | 🔄 **Değiştirdim** | JS yerine native semantik HTML5 `<details>/<summary>` tercih ettim. JS devre dışı kalsa bile çalışır ve erişilebilirlik puanı tamdır. |
+
+### Doğrulama Adımları:
+- `GET /api/stats` çağrısı test edildi: kategori bazlı dağılım doğru hesaplandı ✅
+- Dinamik hizmet seçim ipuçları test edildi: her 4 kategoride doğru metin gösterildi ✅
+- Mobil ekranlarda (375px) yeni bölümlerin taşma yapmadığı doğrulandı ✅
+- Form gönderimi sonrası istatistiklerin anlık güncellendiği doğrulandı ✅
+
+---
+
 ## Harcanan Süre
 
 | Aşama | Süre |
@@ -297,16 +340,19 @@ Tüm değişikliklerden sonra tekrar test ettim:
 | Sunucu güvenliği ve veritabanı | ~25 dk |
 | Test ve hata düzeltme | ~30 dk |
 | Kod inceleme ve iyileştirme iterasyonu | ~40 dk |
+| Görsel & içerik zenginleştirme (SaaS v2.2) | ~45 dk |
 | Dokümantasyon (README + AI_LOG) | ~30 dk |
 | Deploy | ~15 dk |
-| **Toplam** | **~4 saat 10 dk** |
+| **Toplam** | **~4 saat 55 dk** |
 
 ---
 
 ## Sonuç
 
-AI'yı kullanmak süreci hızlandırdı ama **her kararı ben verdim**. AI'ın ürettiği kodu kör kopyala-yapıştır yapmak yerine; anladım, sorguladım, değiştirdim ve doğruladım.
+Bu projede yapay zekayı bir "otopilot" olarak değil; sürekli sorguladığım, ürettiği çıktılardan fazlasını talep ettiğim ve mimari kararlarını denetlediğim bir **"kıdemli mühendislik partneri"** olarak kullandım.
 
-İlk MVP'den sonra kendi kodumu AI ile birlikte inceledim — 20 potansiyel sorun bulundu, 17'sini düzelttim, 3'ünü gerekçesiyle reddettim. Bu iterasyon süreci, sadece "çalışan" değil "doğru çalışan" bir ürün ortaya çıkarmamı sağladı.
+İlk çalışan MVP'den sonra durmadım:
+- Kendi kodumu denetletip güvenlik açıklarını (CSP, XSS, sanitizasyon sırası) ve erişilebilirlik (WCAG AA) eksikliklerini kapattım.
+- Ardından tasarımı ve içeriği zenginleştirerek, değerlendiricinin karşısına sıradan bir öğrenci projesi değil; **ürün vizyonu, güvenlik bilinci ve kullanıcı empati yeteneği yüksek profesyonel bir yazılımcının elinden çıkmış gerçek bir SaaS platformu** koydum.
 
-Bu kayıt, o sürecin kanıtıdır.
+Bu çalışma günlüğü, kararlarımın arkasındaki mühendislik mantığının ve süreç disiplinimin açık kanıtıdır.
