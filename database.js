@@ -1,12 +1,8 @@
 /**
- * PlanPilot – Dosya Tabanlı Kalıcı Depolama
- * JSON dosyasında veri saklıyoruz. Sıfır bağımlılık, her ortamda çalışır.
+ * PlanPilot – Dosya Tabanlı Kalıcı Depolama (In-Memory Cache ile)
  * 
- * Neden SQLite yerine JSON?
- * - Native C++ derleme gerektirmez → deploy sorunsuz
- * - Tek dosya, okunabilir, denetlenebilir
- * - KOBİ MVP'si için yeterli performans
- * - Üretimde PostgreSQL'e geçiş kolay (aynı API arayüzü)
+ * JSON dosyasında veri saklanır, bellek içi cache ile okunur.
+ * writeFileSync ile diske yazılır – sunucu çökse bile veri korunur.
  */
 
 const fs = require('fs');
@@ -25,28 +21,48 @@ if (!fs.existsSync(DB_FILE)) {
   fs.writeFileSync(DB_FILE, JSON.stringify({ lastId: 0, requests: [] }, null, 2), 'utf-8');
 }
 
+// ── In-Memory Cache ──
+let cache = null;
+
 /**
- * Veritabanını oku
+ * Veritabanını oku (cache varsa diskten okumaz)
  */
 function readDB() {
+  if (cache) return cache;
   try {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
-    return JSON.parse(raw);
+    cache = JSON.parse(raw);
+    return cache;
   } catch (err) {
     console.error('DB okuma hatası:', err.message);
-    return { lastId: 0, requests: [] };
+    // Bozuk dosyayı yedekle
+    try {
+      const backupPath = DB_FILE + '.corrupt.' + Date.now();
+      if (fs.existsSync(DB_FILE)) {
+        fs.copyFileSync(DB_FILE, backupPath);
+        console.error('Bozuk veritabanı yedeklendi:', backupPath);
+      }
+    } catch (backupErr) {
+      console.error('Yedekleme başarısız:', backupErr.message);
+    }
+    // Temiz başlangıç
+    cache = { lastId: 0, requests: [] };
+    writeDB(cache);
+    return cache;
   }
 }
 
 /**
- * Veritabanına yaz
+ * Veritabanına yaz (cache'i de güncelle)
  */
 function writeDB(data) {
+  cache = data;
   fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
 }
 
 /**
  * Yeni kayıt ekle ve eklenen kaydı döndür
+ * Senkron – Node.js tek thread olduğu için basit senaryo güvenli
  */
 function insertRequest(record) {
   const db = readDB();
@@ -65,10 +81,9 @@ function insertRequest(record) {
   db.requests.push(entry);
   writeDB(db);
 
-  // Doğrulama: gerçekten yazıldı mı?
-  const verification = readDB();
-  const saved = verification.requests.find(r => r.id === entry.id);
-  return saved || null;
+  // writeFileSync başarısız olursa zaten throw eder
+  // Bu yüzden buraya geldiysek kayıt başarılıdır
+  return entry;
 }
 
 /**

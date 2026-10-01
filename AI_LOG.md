@@ -206,6 +206,86 @@ AI'yı bir **kod üretici** olarak değil, bir **düşünce ortağı** olarak ku
 
 ---
 
+## Adım 10 – Kod İnceleme ve İyileştirme İterasyonu
+
+MVP tesliminden sonra kendi kodumu inceledim ve AI'ya "bu kodu değerlendir, güvenlik/erişilebilirlik/performans açısından eksikleri bul" dedim.
+
+**AI'ın bulduğu sorunlar ve benim kararlarım:**
+
+### Güvenlik Düzeltmeleri
+
+| Bulgu | AI Önerisi | Kararım |
+|-------|-----------|---------|
+| CSP'de `'unsafe-inline'` scriptSrc'de | Kaldır | ✅ Kabul ettim. script.js zaten harici dosya, inline script yok |
+| `innerHTML` ile hata mesajı gösterimi (XSS riski) | DOM API kullan | ✅ Kabul ettim. `createElement` + `textContent` ile değiştirdim |
+| `req.connection` deprecated | `req.socket` kullan | ✅ Kabul ettim |
+| Health endpoint'te `err.message` dışarıya sızıyor | Generic mesaj döndür | ✅ Kabul ettim. `'Sunucu hatası'` olarak değiştirdim |
+| Doğrulama: sanitize edildikten sonra uzunluk kontrolü | Önce ham değerde kontrol et | ✅ Kabul ettim. `<` → `&lt;` (4 char) dönüşümü uzunluğu bozuyordu |
+| E-posta sanitize edilmesi bozabilir | Sadece validate et, sanitize etme | ✅ Kabul ettim. Whitelist'li alanlar da sanitize edilmiyordu |
+
+### Erişilebilirlik İyileştirmeleri
+
+| İyileştirme | Kaynak |
+|-------------|--------|
+| Skip navigation link eklendi | AI önerdi, kabul ettim (WCAG 2.4.1) |
+| `<main>` landmark eklendi | Kendim fark ettim |
+| `aria-invalid="true/false"` form alanlarına eklendi | AI önerdi, kabul ettim |
+| `aria-live="assertive"` alert'lere eklendi | AI önerdi, kabul ettim |
+| `aria-required="true"` form alanlarına eklendi | Kendim ekledim |
+| `aria-atomic="true"` karakter sayacına eklendi | Kendim ekledim |
+| `prefers-reduced-motion` medya sorgusu eklendi | AI önerdi, genişleterek kabul ettim |
+| `role="img"` + `aria-label` emojilere eklendi | Kendim ekledim |
+| Adımlar `<div>` yerine semantik `<ol>/<li>` yapıldı | Kendim fark ettim |
+| Touch target minimum 44-48px yapıldı | AI önerdi (WCAG 2.5.8) |
+| Form input font-size 1rem yapıldı (iOS zoom fix) | AI önerdi, kabul ettim |
+
+### Performans İyileştirmeleri
+
+| İyileştirme | Detay |
+|-------------|-------|
+| In-memory cache eklendi | `readDB()` her çağrıda disk okuması yapıyordu → cache ile tek okuma |
+| Gereksiz doğrulama okuması kaldırıldı | INSERT sonrası ikinci `readDB()` kaldırıldı; `writeFileSync` zaten hata fırlatır |
+| Static dosya cache header'ları eklendi | `maxAge: '1d'`, `etag: true` |
+| `urlencoded` middleware kaldırıldı | API sadece JSON kabul ediyor, gereksizdi |
+| Bozuk DB otomatik yedekleme | Corrupt JSON → `.corrupt.timestamp` dosyasına yedekle, temiz başla |
+
+### UX İyileştirmeleri (Kendi Kararlarım)
+
+- **Fetch timeout (15 saniye):** Sunucu yanıt vermezse kullanıcı sonsuza kadar beklemesin
+- **Content-Type kontrolü:** Proxy/CDN HTML hatası dönerse "sunucu geçersiz yanıt döndü" mesajı
+- **HTTP status + success flag birlikte kontrol:** 500 + `{success: true}` edge case'i engellendi
+- **Geçerli alan yeşil border:** Kullanıcı hangi alanın doğru olduğunu görüyor
+- **Karakter sayacı uyarı rengi:** 900/1000'i geçince kırmızıya dönüyor
+- **API 404 handler:** `/api/bilinmeyen` artık JSON hata dönüyor, index.html değil
+- **SVG favicon:** Dış dosya bağımlılığı olmadan inline favicon
+- **Open Graph meta tags:** Sosyal medyada paylaşım için
+- **Print stilleri:** Yazdırma görünümü düzenlendi
+- **Alert animasyonu:** fadeSlideIn ile daha yumuşak görünüm
+
+### Reddettiklerim
+
+| AI Önerisi | Neden Reddettim |
+|-----------|-----------------|
+| `proper-lockfile` paketi ekle (yazma kilidi) | Node.js tek thread; senkron `writeFileSync` yeterli. Gereksiz bağımlılık eklemeye gerek yok |
+| `robots` meta tag ekle | Kurgusal hizmet, SEO gereksiz |
+| Canonical URL | Tek sayfa, tek URL, gerek yok |
+
+### Doğrulama
+
+Tüm değişikliklerden sonra tekrar test ettim:
+
+| Test | Sonuç |
+|------|-------|
+| Geçerli form → 201 + başarı | ✅ |
+| Geçersiz form → 400 + 4 hata | ✅ |
+| API 404 (`/api/bilinmeyen`) → JSON 404 | ✅ |
+| Health check → doğru kayıt sayısı | ✅ |
+| DB dosyası silindikten sonra → otomatik oluşuyor | ✅ |
+| Skip link → Tab ile erişilebilir | ✅ |
+| Lighthouse erişilebilirlik → 95+ | ✅ |
+
+---
+
 ## Harcanan Süre
 
 | Aşama | Süre |
@@ -216,12 +296,17 @@ AI'yı bir **kod üretici** olarak değil, bir **düşünce ortağı** olarak ku
 | Form doğrulama (istemci + sunucu) | ~30 dk |
 | Sunucu güvenliği ve veritabanı | ~25 dk |
 | Test ve hata düzeltme | ~30 dk |
-| Dokümantasyon (README + AI_LOG) | ~25 dk |
+| Kod inceleme ve iyileştirme iterasyonu | ~40 dk |
+| Dokümantasyon (README + AI_LOG) | ~30 dk |
 | Deploy | ~15 dk |
-| **Toplam** | **~3 saat 25 dk** |
+| **Toplam** | **~4 saat 10 dk** |
 
 ---
 
 ## Sonuç
 
-AI'yı kullanmak süreci hızlandırdı ama **her kararı ben verdim**. AI'ın ürettiği kodu kör kopyala-yapıştır yapmak yerine; anladım, sorguladım, değiştirdim ve doğruladım. Bu kayıt, o sürecin kanıtıdır.
+AI'yı kullanmak süreci hızlandırdı ama **her kararı ben verdim**. AI'ın ürettiği kodu kör kopyala-yapıştır yapmak yerine; anladım, sorguladım, değiştirdim ve doğruladım.
+
+İlk MVP'den sonra kendi kodumu AI ile birlikte inceledim — 20 potansiyel sorun bulundu, 17'sini düzelttim, 3'ünü gerekçesiyle reddettim. Bu iterasyon süreci, sadece "çalışan" değil "doğru çalışan" bir ürün ortaya çıkarmamı sağladı.
+
+Bu kayıt, o sürecin kanıtıdır.

@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PlanPilot – Akıllı Randevu &amp; Talep Yönetimi</title>
   <meta name="description" content="KOBİ'ler için akıllı randevu ve talep yönetim sistemi. Müşteri taleplerini tek noktadan yönetin." />
+
+  <!-- Open Graph / Sosyal Medya -->
+  <meta property="og:title" content="PlanPilot – Akıllı Randevu & Talep Yönetimi" />
+  <meta property="og:description" content="KOBİ'ler için akıllı randevu ve talep yönetim sistemi." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#4F46E5" />
+
+  <!-- Favicon (inline SVG – dış dosya bağımlılığı yok) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%234F46E5'/><text x='50' y='72' font-size='60' font-weight='bold' text-anchor='middle' fill='white'>P</text></svg>" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -20,13 +30,16 @@
       --bg: #FFFFFF;
       --bg-alt: #F8FAFC;
       --border: #E2E8F0;
-      --success: #059669;
+      --success: #047857;
       --success-bg: #ECFDF5;
-      --error: #DC2626;
+      --success-border: #A7F3D0;
+      --error: #B91C1C;
       --error-bg: #FEF2F2;
+      --error-border: #FECACA;
       --radius: 12px;
       --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
       --shadow-lg: 0 4px 24px rgba(0,0,0,0.1);
+      --transition: 0.2s ease;
     }
     html { scroll-behavior: smooth; }
     body {
@@ -40,6 +53,15 @@
     a:hover { text-decoration: underline; }
     img { max-width: 100%; height: auto; }
 
+    /* ── Skip Navigation (Erişilebilirlik) ── */
+    .skip-link {
+      position: absolute; top: -100%; left: 16px; z-index: 200;
+      background: var(--primary); color: #fff; padding: 12px 24px;
+      border-radius: 0 0 8px 8px; font-weight: 600; font-size: 0.9rem;
+      transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; text-decoration: none; }
+
     /* ── Layout ── */
     .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
     .section { padding: 80px 0; }
@@ -49,18 +71,22 @@
       position: sticky; top: 0; z-index: 100;
       background: rgba(255,255,255,0.92);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 16px 0;
     }
     .navbar .container { display: flex; align-items: center; justify-content: space-between; }
     .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .logo:hover { text-decoration: none; }
     .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; font-weight: 800; }
     .nav-cta {
-      background: var(--primary); color: #fff; border: none; padding: 10px 24px;
+      display: inline-block; background: var(--primary); color: #fff; border: none; padding: 10px 24px;
       border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;
-      transition: background 0.2s;
+      transition: background var(--transition);
+      min-height: 44px; min-width: 44px; /* Touch target */
+      display: flex; align-items: center;
     }
-    .nav-cta:hover { background: var(--primary-dark); text-decoration: none; }
+    .nav-cta:hover, .nav-cta:focus { background: var(--primary-dark); text-decoration: none; }
 
     /* ── Hero ── */
     .hero { padding: 100px 0 80px; text-align: center; background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg) 100%); }
@@ -75,9 +101,10 @@
     .hero-cta {
       display: inline-block; background: var(--primary); color: #fff; padding: 14px 36px;
       border-radius: 10px; font-weight: 600; font-size: 1.05rem;
-      transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 14px rgba(79,70,229,0.3);
+      transition: background var(--transition), transform 0.15s; box-shadow: 0 4px 14px rgba(79,70,229,0.3);
+      min-height: 48px; /* Touch target */
     }
-    .hero-cta:hover { background: var(--primary-dark); transform: translateY(-1px); text-decoration: none; }
+    .hero-cta:hover, .hero-cta:focus { background: var(--primary-dark); transform: translateY(-1px); text-decoration: none; }
     .hero-stats { display: flex; justify-content: center; gap: 48px; margin-top: 56px; flex-wrap: wrap; }
     .stat { text-align: center; }
     .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); }
@@ -91,7 +118,7 @@
     .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
     .feature-card {
       background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 32px; transition: box-shadow 0.2s, transform 0.15s;
+      padding: 32px; transition: box-shadow var(--transition), transform 0.15s;
     }
     .feature-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
     .feature-icon {
@@ -125,28 +152,35 @@
     .form-group label .required { color: var(--error); }
     .form-input, .form-select, .form-textarea {
       width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px;
-      font-family: inherit; font-size: 0.95rem; color: var(--text);
-      transition: border-color 0.2s, box-shadow 0.2s; background: var(--bg);
+      font-family: inherit; font-size: 1rem; color: var(--text);
+      transition: border-color var(--transition), box-shadow var(--transition); background: var(--bg);
+      min-height: 48px; /* Touch target – WCAG 2.5.8 */
     }
     .form-input:focus, .form-select:focus, .form-textarea:focus {
-      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
     }
     .form-input.input-error, .form-select.input-error, .form-textarea.input-error {
-      border-color: var(--error); box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+      border-color: var(--error); box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
-    .form-textarea { resize: vertical; min-height: 100px; }
-    .field-error { color: var(--error); font-size: 0.8rem; margin-top: 4px; display: none; }
+    .form-input.input-valid, .form-select.input-valid, .form-textarea.input-valid {
+      border-color: var(--success);
+    }
+    .form-textarea { resize: vertical; min-height: 120px; }
+    .field-error { color: var(--error); font-size: 0.8rem; margin-top: 4px; display: none; font-weight: 500; }
     .field-error.visible { display: block; }
     .char-count { text-align: right; font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
+    .char-count.warning { color: var(--error); font-weight: 600; }
 
     /* ── Submit Button ── */
     .btn-submit {
       width: 100%; padding: 14px; border: none; border-radius: 10px;
       background: var(--primary); color: #fff; font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: background 0.2s, opacity 0.2s;
+      cursor: pointer; transition: background var(--transition), opacity var(--transition), transform 0.1s;
       display: flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 52px; /* Touch target */
     }
     .btn-submit:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-submit:active:not(:disabled) { transform: scale(0.98); }
     .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
     .spinner {
       width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.3);
@@ -164,11 +198,17 @@
     .alert {
       padding: 16px 20px; border-radius: 10px; font-size: 0.9rem; font-weight: 500;
       margin-bottom: 24px; display: none; align-items: flex-start; gap: 10px;
+      animation: fadeSlideIn 0.3s ease;
     }
     .alert.visible { display: flex; }
-    .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid #A7F3D0; }
-    .alert-error { background: var(--error-bg); color: var(--error); border: 1px solid #FECACA; }
+    .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+    .alert-error { background: var(--error-bg); color: var(--error); border: 1px solid var(--error-border); }
     .alert-icon { font-size: 1.2rem; flex-shrink: 0; line-height: 1; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     /* ── Footer ── */
     .footer {
@@ -193,7 +233,7 @@
 
     /* ── Accessibility ── */
     :focus-visible {
-      outline: 2px solid var(--primary);
+      outline: 3px solid var(--primary);
       outline-offset: 2px;
     }
     .sr-only {
@@ -201,9 +241,29 @@
       padding: 0; margin: -1px; overflow: hidden;
       clip: rect(0,0,0,0); white-space: nowrap; border: 0;
     }
+
+    /* ── Reduced Motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ── Print ── */
+    @media print {
+      .navbar, .hero-cta, .nav-cta, .btn-submit { display: none; }
+      .hero { background: none; padding: 20px 0; }
+      .section { padding: 20px 0; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Skip Navigation – Klavye kullanıcıları için -->
+  <a href="#talep-formu" class="skip-link">İçeriğe geç</a>
 
   <!-- ════ Navbar ════ -->
   <nav class="navbar" role="navigation" aria-label="Ana navigasyon">
@@ -216,173 +276,178 @@
     </div>
   </nav>
 
-  <!-- ════ Hero ════ -->
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="container">
-      <div class="hero-badge" aria-hidden="true">KOBİ'ler için Tasarlandı</div>
-      <h1 id="hero-title">
-        Müşteri taleplerini<br /><span>tek noktadan yönetin.</span>
-      </h1>
-      <p>
-        WhatsApp, telefon ve not defteri arasında kaybolmayın.
-        PlanPilot ile gelen talepleri düzenli şekilde alın, takip edin ve hiçbir fırsatı kaçırmayın.
-      </p>
-      <a href="#talep-formu" class="hero-cta">Ücretsiz Talep Oluştur →</a>
+  <!-- ════ Ana İçerik ════ -->
+  <main id="main-content">
 
-      <div class="hero-stats" aria-label="İstatistikler">
-        <div class="stat">
-          <div class="stat-number">2,500+</div>
-          <div class="stat-label">Aktif İşletme</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">%98</div>
-          <div class="stat-label">Memnuniyet Oranı</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">50K+</div>
-          <div class="stat-label">İşlenen Talep</div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <!-- ════ Hero ════ -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container">
+        <div class="hero-badge" aria-hidden="true">KOBİ'ler için Tasarlandı</div>
+        <h1 id="hero-title">
+          Müşteri taleplerini<br /><span>tek noktadan yönetin.</span>
+        </h1>
+        <p>
+          WhatsApp, telefon ve not defteri arasında kaybolmayın.
+          PlanPilot ile gelen talepleri düzenli şekilde alın, takip edin ve hiçbir fırsatı kaçırmayın.
+        </p>
+        <a href="#talep-formu" class="hero-cta">Ücretsiz Talep Oluştur →</a>
 
-  <!-- ════ Özellikler ════ -->
-  <section class="section features" aria-labelledby="features-title">
-    <div class="container">
-      <div class="section-header">
-        <h2 id="features-title">Neden PlanPilot?</h2>
-        <p>Küçük işletmelerin en büyük sorunu: dağınık müşteri talepleri. Biz bunu çözüyoruz.</p>
-      </div>
-      <div class="features-grid">
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">📋</div>
-          <h3>Tek Sayfa, Tüm Talepler</h3>
-          <p>Müşterileriniz tek bir form üzerinden randevu, teklif ve destek taleplerini kolayca iletir.</p>
-        </article>
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">🔔</div>
-          <h3>Anında Bildirim</h3>
-          <p>Her yeni talep geldiğinde anında e-posta bildirimi alın. Hiçbir müşteri yanıtsız kalmaz.</p>
-        </article>
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">📊</div>
-          <h3>Takip &amp; Raporlama</h3>
-          <p>Gelen talepleri durumlarına göre takip edin. Haftalık raporlarla işinizi büyütün.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ════ Nasıl Çalışır ════ -->
-  <section class="section" aria-labelledby="steps-title">
-    <div class="container">
-      <div class="section-header">
-        <h2 id="steps-title">Nasıl Çalışır?</h2>
-        <p>Üç basit adımda müşteri taleplerini düzene sokun.</p>
-      </div>
-      <div class="steps-grid">
-        <div class="step">
-          <div class="step-number" aria-hidden="true">1</div>
-          <h3>Sayfanızı Paylaşın</h3>
-          <p>PlanPilot bağlantınızı müşterilerinize gönderin veya web sitenize ekleyin.</p>
-        </div>
-        <div class="step">
-          <div class="step-number" aria-hidden="true">2</div>
-          <h3>Talepler Gelsin</h3>
-          <p>Müşteriler formu doldursun; tüm bilgiler güvenle kaydedilsin.</p>
-        </div>
-        <div class="step">
-          <div class="step-number" aria-hidden="true">3</div>
-          <h3>Yönetin &amp; Büyüyün</h3>
-          <p>Talepleri görüntüleyin, yanıtlayın ve işinizi ölçeklendirin.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ════ Talep Formu ════ -->
-  <section class="section form-section" id="talep-formu" aria-labelledby="form-title">
-    <div class="container">
-      <div class="section-header">
-        <h2 id="form-title">Hizmet Talebi Oluşturun</h2>
-        <p>Formu doldurun, size en kısa sürede dönüş yapalım.</p>
-      </div>
-
-      <div class="form-wrapper">
-        <!-- Uyarı Mesajları -->
-        <div class="alert alert-success" id="alert-success" role="alert">
-          <span class="alert-icon" aria-hidden="true">✅</span>
-          <div>
-            <strong>Talebiniz başarıyla gönderildi!</strong><br />
-            <span id="success-detail">En kısa sürede sizinle iletişime geçeceğiz.</span>
+        <div class="hero-stats" role="group" aria-label="PlanPilot istatistikleri">
+          <div class="stat">
+            <div class="stat-number" aria-label="İki bin beş yüzden fazla">2,500+</div>
+            <div class="stat-label">Aktif İşletme</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">%98</div>
+            <div class="stat-label">Memnuniyet Oranı</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number" aria-label="Elli binden fazla">50K+</div>
+            <div class="stat-label">İşlenen Talep</div>
           </div>
         </div>
-        <div class="alert alert-error" id="alert-error" role="alert">
-          <span class="alert-icon" aria-hidden="true">❌</span>
-          <div id="error-message">Bir hata oluştu. Lütfen tekrar deneyin.</div>
+      </div>
+    </section>
+
+    <!-- ════ Özellikler ════ -->
+    <section class="section features" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-header">
+          <h2 id="features-title">Neden PlanPilot?</h2>
+          <p>Küçük işletmelerin en büyük sorunu: dağınık müşteri talepleri. Biz bunu çözüyoruz.</p>
+        </div>
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon" role="img" aria-label="Form ikonu">📋</div>
+            <h3>Tek Sayfa, Tüm Talepler</h3>
+            <p>Müşterileriniz tek bir form üzerinden randevu, teklif ve destek taleplerini kolayca iletir.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" role="img" aria-label="Bildirim ikonu">🔔</div>
+            <h3>Anında Bildirim</h3>
+            <p>Her yeni talep geldiğinde anında e-posta bildirimi alın. Hiçbir müşteri yanıtsız kalmaz.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon" role="img" aria-label="Grafik ikonu">📊</div>
+            <h3>Takip &amp; Raporlama</h3>
+            <p>Gelen talepleri durumlarına göre takip edin. Haftalık raporlarla işinizi büyütün.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ Nasıl Çalışır ════ -->
+    <section class="section" aria-labelledby="steps-title">
+      <div class="container">
+        <div class="section-header">
+          <h2 id="steps-title">Nasıl Çalışır?</h2>
+          <p>Üç basit adımda müşteri taleplerini düzene sokun.</p>
+        </div>
+        <ol class="steps-grid" role="list">
+          <li class="step">
+            <div class="step-number" aria-hidden="true">1</div>
+            <h3>Sayfanızı Paylaşın</h3>
+            <p>PlanPilot bağlantınızı müşterilerinize gönderin veya web sitenize ekleyin.</p>
+          </li>
+          <li class="step">
+            <div class="step-number" aria-hidden="true">2</div>
+            <h3>Talepler Gelsin</h3>
+            <p>Müşteriler formu doldursun; tüm bilgiler güvenle kaydedilsin.</p>
+          </li>
+          <li class="step">
+            <div class="step-number" aria-hidden="true">3</div>
+            <h3>Yönetin &amp; Büyüyün</h3>
+            <p>Talepleri görüntüleyin, yanıtlayın ve işinizi ölçeklendirin.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ════ Talep Formu ════ -->
+    <section class="section form-section" id="talep-formu" aria-labelledby="form-title">
+      <div class="container">
+        <div class="section-header">
+          <h2 id="form-title">Hizmet Talebi Oluşturun</h2>
+          <p>Formu doldurun, size en kısa sürede dönüş yapalım.</p>
         </div>
 
-        <form id="request-form" novalidate>
-          <div class="form-group">
-            <label for="full_name">Ad Soyad <span class="required" aria-label="zorunlu">*</span></label>
-            <input
-              type="text" id="full_name" name="full_name" class="form-input"
-              placeholder="Örn: Ayşe Yılmaz" required minlength="2" maxlength="100"
-              autocomplete="name" aria-describedby="full_name-error"
-            />
-            <div class="field-error" id="full_name-error" aria-live="polite"></div>
+        <div class="form-wrapper">
+          <!-- Uyarı Mesajları -->
+          <div class="alert alert-success" id="alert-success" role="alert" aria-live="assertive">
+            <span class="alert-icon" aria-hidden="true">✅</span>
+            <div>
+              <strong>Talebiniz başarıyla gönderildi!</strong><br />
+              <span id="success-detail">En kısa sürede sizinle iletişime geçeceğiz.</span>
+            </div>
+          </div>
+          <div class="alert alert-error" id="alert-error" role="alert" aria-live="assertive">
+            <span class="alert-icon" aria-hidden="true">❌</span>
+            <div id="error-message">Bir hata oluştu. Lütfen tekrar deneyin.</div>
           </div>
 
-          <div class="form-group">
-            <label for="email">E-posta <span class="required" aria-label="zorunlu">*</span></label>
-            <input
-              type="email" id="email" name="email" class="form-input"
-              placeholder="Örn: ayse@firma.com" required
-              autocomplete="email" aria-describedby="email-error"
-            />
-            <div class="field-error" id="email-error" aria-live="polite"></div>
-          </div>
+          <form id="request-form" novalidate>
+            <div class="form-group">
+              <label for="full_name">Ad Soyad <span class="required" aria-hidden="true">*</span><span class="sr-only">(zorunlu)</span></label>
+              <input
+                type="text" id="full_name" name="full_name" class="form-input"
+                placeholder="Örn: Ayşe Yılmaz" required minlength="2" maxlength="100"
+                autocomplete="name" aria-describedby="full_name-error" aria-required="true"
+              />
+              <div class="field-error" id="full_name-error" role="alert" aria-live="polite"></div>
+            </div>
 
-          <div class="form-group">
-            <label for="service_type">Hizmet Türü <span class="required" aria-label="zorunlu">*</span></label>
-            <select id="service_type" name="service_type" class="form-select" required aria-describedby="service_type-error">
-              <option value="">-- Hizmet seçiniz --</option>
-              <option value="danismanlik">Danışmanlık Randevusu</option>
-              <option value="teklif">Teklif Talebi</option>
-              <option value="teknik-destek">Teknik Destek</option>
-              <option value="genel-bilgi">Genel Bilgi Talebi</option>
-            </select>
-            <div class="field-error" id="service_type-error" aria-live="polite"></div>
-          </div>
+            <div class="form-group">
+              <label for="email">E-posta <span class="required" aria-hidden="true">*</span><span class="sr-only">(zorunlu)</span></label>
+              <input
+                type="email" id="email" name="email" class="form-input"
+                placeholder="Örn: ayse@firma.com" required maxlength="254"
+                autocomplete="email" aria-describedby="email-error" aria-required="true"
+              />
+              <div class="field-error" id="email-error" role="alert" aria-live="polite"></div>
+            </div>
 
-          <div class="form-group">
-            <label for="description">Açıklama <span class="required" aria-label="zorunlu">*</span></label>
-            <textarea
-              id="description" name="description" class="form-textarea"
-              placeholder="Talebinizi kısaca açıklayın..." required minlength="10" maxlength="1000"
-              aria-describedby="description-error description-charcount"
-            ></textarea>
-            <div class="char-count" id="description-charcount" aria-live="polite">0 / 1000</div>
-            <div class="field-error" id="description-error" aria-live="polite"></div>
-          </div>
+            <div class="form-group">
+              <label for="service_type">Hizmet Türü <span class="required" aria-hidden="true">*</span><span class="sr-only">(zorunlu)</span></label>
+              <select id="service_type" name="service_type" class="form-select" required aria-describedby="service_type-error" aria-required="true">
+                <option value="">-- Hizmet seçiniz --</option>
+                <option value="danismanlik">Danışmanlık Randevusu</option>
+                <option value="teklif">Teklif Talebi</option>
+                <option value="teknik-destek">Teknik Destek</option>
+                <option value="genel-bilgi">Genel Bilgi Talebi</option>
+              </select>
+              <div class="field-error" id="service_type-error" role="alert" aria-live="polite"></div>
+            </div>
 
-          <button type="submit" class="btn-submit" id="btn-submit">
-            <span class="spinner" aria-hidden="true"></span>
-            <span class="btn-text">Talebi Gönder</span>
-            <span class="btn-loading-text">Gönderiliyor...</span>
-          </button>
-        </form>
+            <div class="form-group">
+              <label for="description">Açıklama <span class="required" aria-hidden="true">*</span><span class="sr-only">(zorunlu)</span></label>
+              <textarea
+                id="description" name="description" class="form-textarea"
+                placeholder="Talebinizi kısaca açıklayın..." required minlength="10" maxlength="1000"
+                aria-describedby="description-error description-charcount" aria-required="true"
+              ></textarea>
+              <div class="char-count" id="description-charcount" aria-live="polite" aria-atomic="true">0 / 1000</div>
+              <div class="field-error" id="description-error" role="alert" aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-submit" aria-busy="false">
+              <span class="spinner" aria-hidden="true"></span>
+              <span class="btn-text">Talebi Gönder</span>
+              <span class="btn-loading-text">Gönderiliyor...</span>
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+  </main>
 
   <!-- ════ Footer ════ -->
   <footer class="footer" role="contentinfo">
     <div class="container">
-      <p>&copy; 2026 PlanPilot. Tüm hakları saklıdır. (Kurgusal hizmettir)</p>
+      <p>&copy; 2026 PlanPilot. Tüm hakları saklıdır. <span aria-hidden="true">·</span> <small>Kurgusal hizmettir</small></p>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
